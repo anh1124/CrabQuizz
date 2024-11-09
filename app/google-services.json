@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:182674929849:android:442a11b8b88d7cf1880368",
         "android_client_info": {
-          "package_name": "com.HolyCrab.CrabQuizz"
+          "package_name": "com.example.crabquizz"
         }
       },
       "oauth_client": [],
