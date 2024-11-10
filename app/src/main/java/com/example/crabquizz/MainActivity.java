@@ -1,6 +1,10 @@
 package com.example.crabquizz;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.util.Log;
 import androidx.activity.EdgeToEdge;
@@ -14,13 +18,24 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 public class MainActivity extends AppCompatActivity {
     private TextView adminDataTextView;
     private FirebaseFirestore db;
+    Button button2;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        button2 = (Button) findViewById(R.id.button2);
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, HomeScreen.class);
+                startActivity(intent);
+            }
+        });
         // Khởi tạo FirebaseFirestore
         db = FirebaseFirestore.getInstance();
 

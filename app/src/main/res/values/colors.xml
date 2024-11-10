@@ -6,4 +6,8 @@
     <color name="red">#FF0000</color>
     <color name="blue">#0000FF</color>
     <color name="green">#00FF00</color>
+
+    <color name="selectedColor">#FF6200EE</color>
+    <color name="unselectedColor">#FFBDBDBD</color>
+    <color name="ripple_effect_color">#33000000</color>
 </resources>

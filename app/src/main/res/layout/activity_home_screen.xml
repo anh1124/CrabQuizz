@@ -9,8 +9,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -34,7 +36,6 @@
 
         </FrameLayout>
 
-        <!-- Card view sẽ đè lên phần dưới của image -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,7 +63,6 @@
                     android:inputType="text"
                     android:maxLines="1" />
 
-                <!-- Nút bắt đầu trắc nghiệm -->
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnStartQuiz"
                     android:layout_width="match_parent"
@@ -70,14 +70,26 @@
                     android:layout_marginBottom="12dp"
                     android:background="@drawable/button_primary"
                     android:padding="12dp"
-                    android:text="Tham gia trắc ngiệm"
+                    android:text="Tham gia trắc nghiệm"
                     android:textColor="@color/white"
                     android:textSize="16sp" />
-
-
             </LinearLayout>
-
         </androidx.cardview.widget.CardView>
-
     </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled"
+        app:itemIconTint="@color/selector_bottom_nav"
+        app:itemTextColor="@color/selector_bottom_nav"
+        app:itemRippleColor="@color/ripple_effect_color" />
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
