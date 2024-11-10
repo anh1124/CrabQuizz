@@ -1,5 +1,4 @@
-package app.Script.Core;
-
+package com.example.crabquizz.Scripts;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -28,12 +27,12 @@ public class Core {
     // Các phương thức khác của Core
     public void initialize() {
         // Logic khởi tạo
-        SharedPreferences sharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = Context.get("UserPrefs", Context.MODE_PRIVATE);
 
         // Lấy username, password, và token từ SharedPreferences
-        this.username = sharedPreferences.getString("username", null);
+        /*this.username = sharedPreferences.getString("username", null);
         this.password = sharedPreferences.getString("password", null);
-        this.token = sharedPreferences.getString("token", null);
+        this.token = sharedPreferences.getString("token", null);*/
     }
 
 
@@ -62,7 +61,7 @@ public class Core {
     }
 
     // Phương thức kiểm tra username, password và token
-    public boolean checkCredentials(String inputUsername, String inputPassword, String inputToken) {
+    /*public boolean checkCredentials(String inputUsername, String inputPassword, String inputToken) {
         return inputUsername.equals(this.username) &&
                 inputPassword.equals(this.password) &&
                 inputToken.equals(this.token);
@@ -79,7 +78,7 @@ public class Core {
         return inputUsername.equals(this.username) &&
                 inputPassword.equals(this.password) &&
                 inputToken.equals(this.token);
-    }
+    }*/
     // Phương thức xóa username, password và token khỏi SharedPreferences
     public void clearCredentials(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);

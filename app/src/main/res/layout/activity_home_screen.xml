@@ -12,6 +12,34 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- Toolbar với nút đăng nhập/đăng ký -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            android:elevation="4dp">
+
+            <!-- Thêm nút Login/Signup -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnLoginSignup"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/button_secondary"
+                android:text="Login / Signup"
+                android:textColor="#C545E2"
+                android:textAllCaps="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"/>
+
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <!-- Phần còn lại của layout giữ nguyên -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="271dp">
@@ -24,17 +52,8 @@
                 android:scaleType="fitXY"
                 tools:srcCompat="@drawable/university_student_cap_mortar_board_and_diploma" />
 
-            <Button
-                android:id="@+id/button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:backgroundTint="@color/black"
-                android:text="Login/Sign up" />
-
         </FrameLayout>
 
-        <!-- Card view sẽ đè lên phần dưới của image -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,7 +81,6 @@
                     android:inputType="text"
                     android:maxLines="1" />
 
-                <!-- Nút bắt đầu trắc nghiệm -->
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnStartQuiz"
                     android:layout_width="match_parent"
@@ -73,7 +91,6 @@
                     android:text="Tham gia trắc ngiệm"
                     android:textColor="@color/white"
                     android:textSize="16sp" />
-
 
             </LinearLayout>
 

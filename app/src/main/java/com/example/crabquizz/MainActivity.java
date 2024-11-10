@@ -1,5 +1,12 @@
 package com.example.crabquizz;
 
+// Thêm imports cho Models
+import com.example.crabquizz.Scripts.Controller.UserController;
+import com.example.crabquizz.Scripts.Models.DbContext;
+import com.example.crabquizz.Scripts.Models.User;
+import com.example.crabquizz.Scripts.SessionManager;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.util.Log;
@@ -9,11 +16,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 public class MainActivity extends AppCompatActivity {
     private TextView adminDataTextView;
-    private FirebaseFirestore db;
+    private DbContext dbContext;
+    private SessionManager sessionManager;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,47 +29,76 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Khởi tạo FirebaseFirestore
-        db = FirebaseFirestore.getInstance();
+        //bắt đầu ở đây
 
-        // Tìm TextView
-        adminDataTextView = findViewById(R.id.adminDataTextView);
+        initPackage();
+        initViews();
 
-        // Thiết lập padding
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        // Đọc dữ liệu từ collection "admins"
-        loadAdminData();
+        //thử đăng nhập bằng token nếu có
+        TryloginWithUsernameAndToken();
     }
+    private void TryloginWithUsernameAndToken() {
+        // Nếu có cả token và username
+        if (sessionManager.isHaveToken() && sessionManager.isHaveUsername()) {
+            String username = sessionManager.getUsername();
+            String token = sessionManager.getToken();
 
-    private void loadAdminData() {
-        db.collection("admins")
-                .document("pDPl8tOemTkPhw66ckKC")  // ID của document trong ảnh của bạn
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        // Lấy dữ liệu từ document
-                        String email = documentSnapshot.getString("email");
-                        String fullName = documentSnapshot.getString("fullName");
-                        String username = documentSnapshot.getString("username");
+            // Kiểm tra user với username và token
+            dbContext.getUserByUsernameAndToken(username, token)
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        // Tìm thấy user, tiếp tục lấy thông tin chi tiết
+                        UserController.getInstance(sessionManager).getUserByUsername(username, new UserController.LoginCallback() {
+                            @Override
+                            public void onLoginSuccess(User user) {
+                                // Lưu thông tin và chuyển sang màn hình chính
+                                sessionManager.saveUserInfo(user);
+                                startActivity(new Intent(MainActivity.this, HomeScreen.class));
+                                finish();
+                            }
 
-                        // Tạo chuỗi hiển thị
-                        String displayText = "Admin Information:\n" +
-                                "Email: " + email + "\n" +
-                                "Full Name: " + fullName + "\n" +
-                                "Username: " + username;
-
-                        // Hiển thị lên TextView
-                        adminDataTextView.setText(displayText);
+                            @Override
+                            public void onLoginFailed(String errorMessage) {
+                                // Nếu thất bại, logout và chuyển màn hình chính
+                                sessionManager.logoutUser();
+                                startActivity(new Intent(MainActivity.this, HomeScreen.class));
+                                finish();
+                            }
+                        });
+                    } else {
+                        // Nếu không tìm thấy user, logout và chuyển màn hình chính
+                        sessionManager.logoutUser();
+                        startActivity(new Intent(MainActivity.this, HomeScreen.class));
+                        finish();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("MainActivity", "Error loading admin data", e);
-                    adminDataTextView.setText("Error loading data: " + e.getMessage());
+                    Log.e("MainActivity", "Error verifying user", e);
+                    // Handle error, e.g., show an error message or retry
                 });
+        } else {
+            // Nếu không có token hoặc username, chuyển về màn hình chính
+            startActivity(new Intent(MainActivity.this, HomeScreen.class));
+            finish();
+        }
     }
+
+
+    // <editor-fold desc="Init">
+//khai báo các thứ trên view
+public void initViews()
+{
+    adminDataTextView = findViewById(R.id.adminDataTextView);
+}
+public void initPackage()
+{
+    // Khởi tạo DbContext
+    dbContext = DbContext.getInstance();
+    sessionManager = SessionManager.getInstance(this);
+}
+
+    // </editor-fold>
+
+
+
 }

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "182674929849",
-    "project_id": "crabquizzdb",
-    "storage_bucket": "crabquizzdb.firebasestorage.app"
+    "project_number": "687538567280",
+    "project_id": "crabquizzdb-2ca66",
+    "storage_bucket": "crabquizzdb-2ca66.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:182674929849:android:442a11b8b88d7cf1880368",
+        "mobilesdk_app_id": "1:687538567280:android:125366cf215329bf3d9cb5",
         "android_client_info": {
           "package_name": "com.example.crabquizz"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBRAY3J2bzLt1swSRW2gmQoYlGxfpSBb70"
+          "current_key": "AIzaSyCogm8JbWVWE1uEO_cdEBDX-iXowLYwmP0"
         }
       ],
       "services": {
