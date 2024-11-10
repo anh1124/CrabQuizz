@@ -12,18 +12,20 @@ public class User {
     private String username;
     private String password;
     private String role;
+    private String token;
 
     // </editor-fold>
 
 
     // Empty constructor required for Firestore
-    public User() {}
+    public User(String string, String sharedPreferencesString, String preferencesString, String s) {}
 
-    public User(String fullName, String username, String password,String role) {
+    public User(String fullName, String username, String password,String role,String token) {
         this.fullName = fullName;
         this.username = username;
         this.password = password;
         this.role = role;
+        this.token = token;
     }
 
     // <editor-fold desc="Getter-Setter">
@@ -64,8 +66,17 @@ public class User {
         return role;
     }
 
-    public void setRole(String password) {
-        this.password = role;
+    public void setRole(String role) {
+        this.token = role;
+    }
+
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
     // </editor-fold>
 }

@@ -10,6 +10,7 @@ public class SessionManager {
     private static SessionManager instance;
 
     // SharedPreferences để lưu dữ liệu phiên đăng nhập
+    //SharedPreferences (Lưu trữ vĩnh viễn)
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
@@ -21,7 +22,7 @@ public class SessionManager {
     private static final String KEY_USERNAME = "username";        // Lưu tên đăng nhập
     private static final String KEY_FULLNAME = "fullname";        // Lưu tên đầy đủ của người dùng
     private static final String KEY_TOKEN = "token";              // Lưu mã token của người dùng
-    private static final String KEY_USER_TYPE = "userType";       // Loại người dùng (admin hoặc user bình thường)
+    private static final String KEY_USER_ROLE = "userRole";       //student or teacher
     private static final String KEY_USER_SESSION = "userSession"; // Thêm khóa để lưu trữ thông tin UserSession
     //không lưu password
 
@@ -48,12 +49,12 @@ public class SessionManager {
 
 
     // Phương thức lưu phiên đăng nhập của người dùng
-    public void createLoginSession(String username, String fullname, String token, String userType) {
+    public void createLoginSession(String username, String fullname, String token, String userRole) {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);       // Đánh dấu trạng thái đăng nhập là true
         editor.putString(KEY_USERNAME, username);
         editor.putString(KEY_FULLNAME, fullname);
         editor.putString(KEY_TOKEN, token);
-        editor.putString(KEY_USER_TYPE, userType);
+        editor.putString(KEY_USER_ROLE, userRole);
         editor.commit();                                 // Lưu lại tất cả thay đổi
     }
     public boolean isHaveToken() {
@@ -104,7 +105,7 @@ public class SessionManager {
                 sharedPreferences.getString(KEY_FULLNAME, null),
                 sharedPreferences.getString(KEY_USERNAME, null),
                 sharedPreferences.getString(KEY_TOKEN, null),
-                sharedPreferences.getString(KEY_USER_TYPE, null)
+                sharedPreferences.getString(KEY_USER_ROLE, null)
         ));
         return session;
     }
@@ -145,6 +146,8 @@ public class SessionManager {
         }
         return userSession;
     }
+
+    //UserSession (Lưu trữ tạm thời trong bộ nhớ)
     public static class UserSession {
         private User user;
 
@@ -155,5 +158,16 @@ public class SessionManager {
         public void setUser(User user) {
             this.user = user;
         }
+
     }
+
+    public void clearUserSession() {
+        // Set userSession to null
+        userSession = null;
+
+        // Remove the userSession data from SharedPreferences
+        editor.remove(KEY_USER_SESSION);
+        editor.commit();
+    }
+
 }

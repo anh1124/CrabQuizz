@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.util.Log;
+import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         initViews();
 
         //thử đăng nhập bằng token nếu có
-        TryloginWithUsernameAndToken();
+       TryloginWithUsernameAndToken();
     }
     private void TryloginWithUsernameAndToken() {
         // Nếu có cả token và username
@@ -43,41 +45,70 @@ public class MainActivity extends AppCompatActivity {
             String username = sessionManager.getUsername();
             String token = sessionManager.getToken();
 
+            Toast.makeText(MainActivity.this,
+                    "Đang kiểm tra thông tin đăng nhập...",
+                    Toast.LENGTH_SHORT).show();
+
             // Kiểm tra user với username và token
             dbContext.getUserByUsernameAndToken(username, token)
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        // Tìm thấy user, tiếp tục lấy thông tin chi tiết
-                        UserController.getInstance(sessionManager).getUserByUsername(username, new UserController.LoginCallback() {
-                            @Override
-                            public void onLoginSuccess(User user) {
-                                // Lưu thông tin và chuyển sang màn hình chính
-                                sessionManager.saveUserInfo(user);
-                                startActivity(new Intent(MainActivity.this, HomeScreen.class));
-                                finish();
-                            }
+                    .addOnSuccessListener(querySnapshot -> {
+                        if (!querySnapshot.isEmpty()) {
+                            // Tìm thấy user, tiếp tục lấy thông tin chi tiết
+                            UserController.getInstance(sessionManager).getUserByUsername(username, new UserController.LoginCallback() {
+                                @Override
+                                public void onLoginSuccess(User user) {
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(MainActivity.this,
+                                                "Đăng nhập thành công! Xin chào " + user.getFullName(),
+                                                Toast.LENGTH_SHORT).show();
+                                    });
 
-                            @Override
-                            public void onLoginFailed(String errorMessage) {
-                                // Nếu thất bại, logout và chuyển màn hình chính
-                                sessionManager.logoutUser();
-                                startActivity(new Intent(MainActivity.this, HomeScreen.class));
-                                finish();
-                            }
-                        });
-                    } else {
-                        // Nếu không tìm thấy user, logout và chuyển màn hình chính
+                                    sessionManager.saveUserInfo(user);
+                                    sessionManager.createLoginSession(user.getUsername(), user.getFullName(), user.getToken(), user.getToken());
+                                    startActivity(new Intent(MainActivity.this, HomeScreen.class));
+                                    finish();
+                                }
+
+                                @Override
+                                public void onLoginFailed(String errorMessage) {
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(MainActivity.this,
+                                                "Đăng nhập thất bại: " + errorMessage,
+                                                Toast.LENGTH_SHORT).show();
+                                    });
+                                    sessionManager.clearUserSession();
+                                    sessionManager.logoutUser();
+                                    startActivity(new Intent(MainActivity.this, HomeScreen.class));
+                                    finish();
+                                }
+                            });
+                        } else {
+                            // Không tìm thấy user
+                            Toast.makeText(MainActivity.this,
+                                    "Không tìm thấy thông tin đăng nhập",
+                                    Toast.LENGTH_SHORT).show();
+
+                            sessionManager.logoutUser();
+                            startActivity(new Intent(MainActivity.this, HomeScreen.class));
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("MainActivity", "Error verifying user", e);
+                        Toast.makeText(MainActivity.this,
+                                "Lỗi khi kiểm tra thông tin: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+
                         sessionManager.logoutUser();
                         startActivity(new Intent(MainActivity.this, HomeScreen.class));
                         finish();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("MainActivity", "Error verifying user", e);
-                    // Handle error, e.g., show an error message or retry
-                });
+                    });
         } else {
-            // Nếu không có token hoặc username, chuyển về màn hình chính
+            // Không có token hoặc username
+            Toast.makeText(MainActivity.this,
+                    "Chưa có thông tin đăng nhập",
+                    Toast.LENGTH_SHORT).show();
+
             startActivity(new Intent(MainActivity.this, HomeScreen.class));
             finish();
         }
@@ -88,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 //khai báo các thứ trên view
 public void initViews()
 {
-    adminDataTextView = findViewById(R.id.adminDataTextView);
+
 }
 public void initPackage()
 {

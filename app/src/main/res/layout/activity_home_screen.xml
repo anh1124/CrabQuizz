@@ -35,6 +35,12 @@
                 android:textAllCaps="false"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"/>
+            <TextView
+                android:id="@+id/textViewGreeting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:text="Chào buổi..." />
 
 
         </androidx.appcompat.widget.Toolbar>
@@ -91,6 +97,8 @@
                     android:text="Tham gia trắc ngiệm"
                     android:textColor="@color/white"
                     android:textSize="16sp" />
+
+
 
             </LinearLayout>
 
