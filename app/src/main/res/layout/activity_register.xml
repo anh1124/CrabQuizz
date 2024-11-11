@@ -10,11 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <Button
             android:id="@+id/buttonbacktomainmenu"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="back" />
+            android:text="&lt;"
+            android:textSize="65px"
+            />
 
         <ImageView
             android:id="@+id/imageView"
@@ -26,43 +29,89 @@
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/textview" />
+            android:text="Đăng ký Crab Quizz \nCreate your new account"
+            android:textAlignment="center"
+            android:gravity="center" />
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputFullName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="FullName (3-20 characters)"
+                app:counterMaxLength="20"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="UserName (3-20 characters)"
+                app:counterMaxLength="20"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputPassWord"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password (3-20 characters)"
+                app:counterMaxLength="20"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Email" />
-
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <CheckBox
+            android:id="@+id/checkBoxIsTeacher"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="UserName" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Password" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="wrap_content"
+            android:text="I'm Teacher" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/buttonRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Register" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textViewBtnGoLogin"
+                android:layout_width="395dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="I have an account!"
+                android:background="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="10dp"
+                android:textColor="@color/selectedColor"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

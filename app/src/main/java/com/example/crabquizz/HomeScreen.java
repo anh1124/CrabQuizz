@@ -1,5 +1,6 @@
 package com.example.crabquizz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -29,6 +30,10 @@ public class HomeScreen extends AppCompatActivity {
         initPackage();
         InitView();
         SetGreeting();
+        SesionChecker();
+    }
+
+    private void SesionChecker() {
 
     }
 
@@ -46,6 +51,11 @@ public class HomeScreen extends AppCompatActivity {
     {
         tvGreeting = findViewById(R.id.textViewGreeting);
         btnLoginSignup = findViewById(R.id.btnLoginSignup);
+
+        btnLoginSignup.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeScreen.this, Register.class);
+            startActivity(intent);
+        });
     }
     private void SetGreeting() {
         SessionManager sessionManager = SessionManager.getInstance(this);

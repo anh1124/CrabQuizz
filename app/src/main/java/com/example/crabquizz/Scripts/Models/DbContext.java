@@ -7,21 +7,28 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class DbContext {
     private static DbContext instance;
     public final FirebaseFirestore db;
 
     // Collections
-    //private final String ADMINS_COLLECTION = "admins";
-    public final String USERS_COLLECTION = "users";
-    public final String QUIZZES_COLLECTION = "quizzes";
 
+    public final String USERS_COLLECTION = "users";
+
+
+
+    public final String APP_SETUP = "appsetup";
+    public final String APP_SETUP_DOC_ID = "4DC2e4QEjy4tMtHjYUUi";
+    //cái appsetup phải giữ document
     private DbContext() {
         db = FirebaseFirestore.getInstance();
     }
+
 
     public static synchronized DbContext getInstance() {
         if (instance == null) {
@@ -31,12 +38,25 @@ public class DbContext {
     }
 
 
-    public Task<QuerySnapshot> getUserByUsernameAndToken(String username, String token) {
-        return db.collection(USERS_COLLECTION)
-                .whereEqualTo("username", username)
-                .whereEqualTo("token", token)
-                .get();
+    public Task<Integer> fetchMaxTokenValidityDays() {
+        return db.collection(APP_SETUP)
+                .document(APP_SETUP_DOC_ID)
+                .get()
+                .continueWith(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        // Parse and return maxTokenValidityDays from the document
+                        DocumentSnapshot document = task.getResult();
+                        return document.getLong("maxTokenValidityDays").intValue();
+                    } else {
+                        throw task.getException(); // Handle exception as needed
+                    }
+                });
     }
+
+
+
+
+
 
     public String getUsersCollection() {
         return USERS_COLLECTION;
