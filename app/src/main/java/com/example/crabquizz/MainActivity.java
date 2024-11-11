@@ -18,6 +18,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+//active này sẽ khởi chạy đầu tiên
+//chức năng là kiểm tra trong sharedPreferences xem có token và username có không
+//nếu có thì thử đăng nhập
+//
+
+
 public class MainActivity extends AppCompatActivity {
     private TextView adminDataTextView;
     private DbContext dbContext;
@@ -36,10 +42,10 @@ public class MainActivity extends AppCompatActivity {
         initPackage();
         initViews();
 
-        //thử đăng nhập bằng token nếu có
-       TryloginWithUsernameAndToken();
+        //thử đăng nhập bằng token nếu có trong sharedPreferences
+       TryloginWithUsernameAndTokenSharedPreferences();
     }
-    private void TryloginWithUsernameAndToken() {
+    private void TryloginWithUsernameAndTokenSharedPreferences() {
         // Nếu có cả token và username
         if (sessionManager.isHaveToken() && sessionManager.isHaveUsername()) {
             String username = sessionManager.getUsername();
@@ -129,6 +135,7 @@ public void initPackage()
 }
 
     // </editor-fold>
+
 
 
 

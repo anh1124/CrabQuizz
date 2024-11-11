@@ -11,7 +11,7 @@ public class User {
     private String fullName;
     private String username;
     private String password;
-    private String role;
+    private String role;//student or teacher or guess
     private String token;
 
     // </editor-fold>

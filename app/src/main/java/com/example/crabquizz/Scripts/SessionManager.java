@@ -18,16 +18,31 @@ public class SessionManager {
     private static final String PREF_NAME = "CrabQuizzSession";
 
     // Các khóa (key) để lưu trữ trạng thái và thông tin người dùng
-    private static final String KEY_IS_LOGGED_IN = "isLoggedIn";  // Để kiểm tra người dùng có đăng nhập không
-    private static final String KEY_USERNAME = "username";        // Lưu tên đăng nhập
-    private static final String KEY_FULLNAME = "fullname";        // Lưu tên đầy đủ của người dùng
-    private static final String KEY_TOKEN = "token";              // Lưu mã token của người dùng
-    private static final String KEY_USER_ROLE = "userRole";       //student or teacher
-    private static final String KEY_USER_SESSION = "userSession"; // Thêm khóa để lưu trữ thông tin UserSession
+    private static String KEY_IS_LOGGED_IN = "isLoggedIn";  // Để kiểm tra người dùng có đăng nhập không
+    private static String KEY_USERNAME = "username";        // Lưu tên đăng nhập
+    private static String KEY_FULLNAME = "fullname";        // Lưu tên đầy đủ của người dùng
+    private static String KEY_TOKEN = "token";              // Lưu mã token của người dùng
+    private static String KEY_USER_ROLE = "userRole";       //student or teacher
+    private static String KEY_USER_SESSION = "userSession"; // Thêm khóa để lưu trữ thông tin UserSession
     //không lưu password
 
-    private UserSession userSession;
+    /*
+    em thiện chỉ cần chú ý cáci cục bên dưới niayf thôi
+    */
+    public UserSession userSession;
+    //UserSession (Lưu trữ tạm thời trong bộ nhớ)
+    public static class UserSession {
+        public User user;
 
+        public User getUser() {
+            return user;
+        }
+
+        public void setUser(User user) {
+            this.user = user;
+        }
+
+    }
 
 
     // Constructor của SessionManager, dùng private để giới hạn truy cập từ bên ngoài lớp này
@@ -133,7 +148,7 @@ public class SessionManager {
 
     // Lấy UserSession từ SharedPreferences
     public UserSession getUserSession() {
-        if (userSession == null) {
+        if (userSession.user == null) {
             String userSessionData = sharedPreferences.getString(KEY_USER_SESSION, null);
             if (userSessionData != null) {
                 // Chuyển chuỗi JSON trở lại đối tượng User bằng Gson
@@ -147,19 +162,7 @@ public class SessionManager {
         return userSession;
     }
 
-    //UserSession (Lưu trữ tạm thời trong bộ nhớ)
-    public static class UserSession {
-        private User user;
 
-        public User getUser() {
-            return user;
-        }
-
-        public void setUser(User user) {
-            this.user = user;
-        }
-
-    }
 
     public void clearUserSession() {
         // Set userSession to null
