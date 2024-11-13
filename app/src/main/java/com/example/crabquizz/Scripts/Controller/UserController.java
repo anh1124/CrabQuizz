@@ -2,7 +2,6 @@ package com.example.crabquizz.Scripts.Controller;
 
 import android.util.Log;
 
-import com.example.crabquizz.Scripts.SessionManager;
 import com.example.crabquizz.Scripts.Models.User;
 import com.example.crabquizz.Scripts.Models.AppSetup;
 
@@ -269,8 +268,10 @@ public class UserController {
     public void logout(CallLogOut callLogOut) {
         //được thêm interface để nhắc cua cua sẽ nhớ thêm cái GoLoginMenu vào đây
         sessionManager.logoutUser();
-        Log.d(TAG, "User logged out successfully");
-
+        Log.d("logout", "User logged out successfully");
+        if (callLogOut != null) {
+            callLogOut.GoLoginMenu();
+        }
     }
 
     public interface Callback {

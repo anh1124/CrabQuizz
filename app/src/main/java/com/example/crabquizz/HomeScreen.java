@@ -3,14 +3,12 @@ package com.example.crabquizz;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.crabquizz.Scripts.Controller.MenuNavigationClickController;
-import com.example.crabquizz.Scripts.SessionManager;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.example.crabquizz.Scripts.Controller.SessionManager;
 
 
 import androidx.activity.EdgeToEdge;
@@ -41,9 +39,12 @@ public class HomeScreen extends AppCompatActivity {
         //nút btnLoginSignup được ẩn bằng hàm dưới
         SetGreeting();
         ShowLoginSignupButton();
-    }
-    public void demoGetUsernameInTempUserSession(){
-        SessionManager.getInstance(this).getUserSession().getUser().getUsername();
+        SetGreeting();
+        SetupImage();
+        // Khởi tạo controller và truyền context
+        MenuNavigationClickController controller = new MenuNavigationClickController(this);
+        // Truyền view của bottom navigation
+        controller.setUpAndHandleBottomNavigationView(findViewById(R.id.bottomNavigation));
     }
     private void ShowLoginSignupButton() {
         SessionManager.UserTEMPSession userSession = SessionManager.getInstance(this).getUserSession();
@@ -62,13 +63,7 @@ public class HomeScreen extends AppCompatActivity {
             // Nếu không có user session, hiển thị nút đăng nhập
             setLoginSignupButtonVisibility(true);
         }
-        SetGreeting();
-        SetupImage();
 
-        // Khởi tạo controller và truyền context
-        MenuNavigationClickController controller = new MenuNavigationClickController(this);
-        // Truyền view của bottom navigation
-        controller.setUpAndHandleBottomNavigationView(findViewById(R.id.bottomNavigation));
     }
 
     private void SetupImage() {

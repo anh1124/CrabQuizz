@@ -29,7 +29,15 @@ class Question {
         this.answer2 = answer2;
         this.correctAnswer = correctAnswer;
     }
-
+    // Constructor với 3 câu trả lời
+    public Question(int id, String question, String answer1, String answer2,String answer3, int correctAnswer) {
+        this.id = id;
+        this.question = question;
+        this.answer1 = answer1;
+        this.answer2 = answer2;
+        this.answer3 = answer3;
+        this.correctAnswer = correctAnswer;
+    }
     // Getters and Setters
     public int getId() {
         return id;
