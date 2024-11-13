@@ -7,4 +7,17 @@
     android:layout_height="match_parent"
     tools:context=".ProfileScreen">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/buttonlogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LOGOUT"
+            android:textColor="@color/red"
+            />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
