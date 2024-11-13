@@ -1,6 +1,7 @@
 package com.example.crabquizz.Scripts.Controller;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -49,24 +50,28 @@ public class MenuNavigationClickController {
                     if (!(context instanceof HomeScreen)) {
                         intent = new Intent(context, HomeScreen.class);
                         saveCurrentScreen(R.id.home);
+                        addTransitionAnimation(intent);
                     }
                     break;
                 case R.id.search:
                     if (!(context instanceof SearchScreen)) {
                         intent = new Intent(context, SearchScreen.class);
                         saveCurrentScreen(R.id.search);
+                        addTransitionAnimation(intent);
                     }
                     break;
                 case R.id.question:
                     if (!(context instanceof QuestionScreen)) {
                         intent = new Intent(context, QuestionScreen.class);
                         saveCurrentScreen(R.id.question);
+                        addTransitionAnimation(intent);
                     }
                     break;
                 case R.id.profile:
                     if (!(context instanceof ProfileScreen)) {
                         intent = new Intent(context, ProfileScreen.class);
                         saveCurrentScreen(R.id.profile);
+                        addTransitionAnimation(intent);
                     }
                     break;
             }
@@ -75,11 +80,21 @@ public class MenuNavigationClickController {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 context.startActivity(intent);
                 if (context instanceof Activity) {
-                    ((Activity) context).finish();
+                    Activity activity = (Activity) context;
+                    activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    activity.finish();
                 }
             }
             return true;
         });
+    }
+
+    private void addTransitionAnimation(Intent intent) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context);
+            intent.putExtra("transition", true);
+        }
     }
 
     private void saveCurrentScreen(int screenId) {

@@ -25,4 +25,10 @@ public class SearchScreen extends AppCompatActivity {
         MenuNavigationClickController controller = new MenuNavigationClickController(this);
         controller.setUpAndHandleBottomNavigationView(findViewById(R.id.bottomNavigation));
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
 }
