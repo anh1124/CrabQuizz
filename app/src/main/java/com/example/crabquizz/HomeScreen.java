@@ -2,6 +2,7 @@ package com.example.crabquizz;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.crabquizz.Scripts.SessionManager;
@@ -27,17 +28,30 @@ public class HomeScreen extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        initPackage();
         InitView();
+
+        //nút btnLoginSignup được ẩn bằng hàm dưới
         SetGreeting();
-        SesionChecker();
+        ShowLoginSignupButton();
     }
 
-    private void SesionChecker() {
+    private void ShowLoginSignupButton() {
+        SessionManager.UserTEMPSession userSession = SessionManager.getInstance(this).getUserSession();
 
-    }
+        if (userSession != null && userSession.getUser() != null) {
+            String role = userSession.getUser().getRole();
+            Log.d("ShowLoginSignupButton", "Role: " + role);
 
-    private void initPackage() {
+            // Chỉ ẩn nút nếu role là "teacher" hoặc "student"
+            if (role.equals("teacher") || role.equals("student")) {
+                setLoginSignupButtonVisibility(false);
+            } else {
+                setLoginSignupButtonVisibility(true);
+            }
+        } else {
+            // Nếu không có user session, hiển thị nút đăng nhập
+            setLoginSignupButtonVisibility(true);
+        }
     }
 
     public void setLoginSignupButtonVisibility(boolean isVisible) {
@@ -63,12 +77,14 @@ public class HomeScreen extends AppCompatActivity {
         String greeting = "Chào buổi " + timeOfDay;
 
         // Kiểm tra xem có user session không
-        SessionManager.UserSession userSession = sessionManager.getUserSession();
-        if (userSession != null && userSession.getUser() != null) {
-            greeting += " " + userSession.getUser().getFullName();
+        SessionManager.UserTEMPSession userTEMPSession = sessionManager.getUserSession();
+        if (userTEMPSession != null && userTEMPSession.getUser() != null) {
+            greeting += " " + userTEMPSession.getUser().getFullName();
+
         }
         else
         {
+            //setLoginSignupButtonVisibility(true);
             greeting += " Guess";
         }
         tvGreeting.setText(greeting);

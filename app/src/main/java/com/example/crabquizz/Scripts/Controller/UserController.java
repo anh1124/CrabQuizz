@@ -1,27 +1,19 @@
 package com.example.crabquizz.Scripts.Controller;
 
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.crabquizz.Register;
 import com.example.crabquizz.Scripts.SessionManager;
 import com.example.crabquizz.Scripts.Models.User;
 import com.example.crabquizz.Scripts.Models.AppSetup;
 
 import com.example.crabquizz.Scripts.Models.DbContext;
-import com.example.crabquizz.Scripts.Models.User;
+import com.example.crabquizz.Scripts.TokenGen;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.example.crabquizz.Scripts.Models.DbContext;
-import com.example.crabquizz.Scripts.Models.User;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Date;
-import java.util.UUID;
 
 public class UserController {
     private static final String TAG = "UserController";
@@ -41,13 +33,8 @@ public class UserController {
         return instance;
     }
 
-    public Task<QuerySnapshot> getUserByUsernameAndToken(String username, String token) {
-        return dbContext.db.collection(dbContext.getUsersCollection())
-                .whereEqualTo("username", username)
-                .whereEqualTo("token", token)
-                .get();
-    }
 
+    //sử dụng cho việc tạo id mới
     public Task<String> getHighestUserId() {
         return dbContext.db.collection(dbContext.getUsersCollection())
                 .orderBy("id", Query.Direction.DESCENDING)
@@ -69,7 +56,7 @@ public class UserController {
                     }
                 });
     }
-
+    //sử dụng cho việc tạo tài khoản với 1 email duy nhất (emailacuatoi)
     public Task<Boolean> isEmailUnique(String email) {
         return dbContext.db.collection(dbContext.getUsersCollection())
                 .whereEqualTo("email", email)
@@ -85,53 +72,8 @@ public class UserController {
     }
 
 
-
-    public void loginWithUsernameAndToken(String username, String token, LoginCallback callback) {
-        dbContext.db.collection(dbContext.getUsersCollection())
-                .whereEqualTo("username", username)
-                .whereEqualTo("token", token)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        DocumentSnapshot userDoc = querySnapshot.getDocuments().get(0);
-                        User user = userDoc.toObject(User.class);
-                        if (user != null) {
-                            // Update user's token if needed
-                            if (!user.getToken().equals(token)) {
-                                user.setToken(token);
-                                userDoc.getReference().update("token", token)
-                                        .addOnSuccessListener(aVoid -> {
-                                            sessionManager.saveUserInfo(user);
-                                            callback.onLoginSuccess(user);
-                                            Log.d(TAG, "User logged in successfully");
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.e(TAG, "Token update error", e);
-                                            callback.onLoginFailed(e.getMessage());
-                                        });
-                            } else {
-                                sessionManager.saveUserInfo(user);
-                                callback.onLoginSuccess(user);
-                                Log.d(TAG, "User logged in successfully");
-                            }
-                        } else {
-                            callback.onLoginFailed("Failed to convert document to User object");
-                        }
-                    } else {
-                        callback.onLoginFailed("Invalid username or token");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Login error", e);
-                    callback.onLoginFailed(e.getMessage());
-                });
-    }
-
-
-    // New method for user registration
-    // User registration method in UserController
     // Phương thức đăng ký người dùng mới
-    public void register(String fullName, String username, String password, String role, String email, RegisterCallback callback) {
+    public void register(String fullName, String username, String password, String role, String email, Callback callback) {
         // Kiểm tra xem username đã tồn tại trong database hay chưa
         dbContext.db.collection(dbContext.getUsersCollection())
                 .whereEqualTo("username", username)
@@ -140,14 +82,14 @@ public class UserController {
                     // Nếu tìm thấy kết quả (tức là username đã tồn tại)
                     if (!querySnapshot.isEmpty()) {
                         // Gọi hàm callback báo lỗi đăng ký vì username đã tồn tại
-                        callback.onRegisterFailed("Username already exists");
+                        callback.onFailed("Username already exists");
                         return;
                     }
                     // Nếu username chưa tồn tại, kiểm tra email
                     isEmailUnique(email).addOnSuccessListener(isUnique -> {
                         if (!isUnique) {
                             // Nếu email không duy nhất, gọi callback báo lỗi
-                            callback.onRegisterFailed("Email already exists");
+                            callback.onFailed("Email already exists");
                             return;
                         }
                         // Lấy ID người dùng cao nhất hiện tại
@@ -168,36 +110,56 @@ public class UserController {
                                     .addOnSuccessListener(aVoid -> {
                                         // Nếu thêm thành công, ghi log và gọi callback báo thành công
                                         Log.d(TAG, "User registered successfully");
-                                        callback.onRegisterSuccess(newUser);
+                                        callback.onSuccess(newUser);
                                     })
                                     .addOnFailureListener(e -> {
                                         // Nếu có lỗi khi thêm vào database, ghi log lỗi và gọi callback báo lỗi
                                         Log.e(TAG, "Registration error", e);
-                                        callback.onRegisterFailed(e.getMessage());
+                                        callback.onFailed(e.getMessage());
                                     });
                         }).addOnFailureListener(e -> {
                             // Nếu có lỗi khi lấy ID người dùng cao nhất, ghi log lỗi và gọi callback báo lỗi
                             Log.e(TAG, "Error getting highest user ID", e);
-                            callback.onRegisterFailed(e.getMessage());
+                            callback.onFailed(e.getMessage());
                         });
 
                     }).addOnFailureListener(e -> {
                         // Nếu có lỗi khi kiểm tra email trong database, ghi log lỗi và gọi callback báo lỗi
                         Log.e(TAG, "Email check error", e);
-                        callback.onRegisterFailed(e.getMessage());
+                        callback.onFailed(e.getMessage());
                     });
                 })
                 .addOnFailureListener(e -> {
                     // Nếu có lỗi khi kiểm tra username trong database, ghi log lỗi và gọi callback báo lỗi
                     Log.e(TAG, "Username check error", e);
-                    callback.onRegisterFailed(e.getMessage());
+                    callback.onFailed(e.getMessage());
                 });
     }
 
+    //hàm này được tạo ra bởi 1 cách thần kỳ do db không lấy được token nên phải làm hàm này nên đừng xóa:((
+    public Task<String> getRoleByToken(String token) {
+        return dbContext.db.collection(dbContext.getUsersCollection())
+                .whereEqualTo("token", token)
+                .get()
+                .continueWith(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                        DocumentSnapshot userDoc = task.getResult().getDocuments().get(0);
+                        User user = userDoc.toObject(User.class);
+                        if (user != null && user.getRole() != null) {
+                            return user.getRole().toString(); // Trả về role dưới dạng String nếu tìm thấy
+                        } else {
+                            Log.e(TAG, "Role not found or is null.");
+                            return null; // Trả về null nếu role không tìm thấy hoặc null
+                        }
+                    } else {
+                        Log.e(TAG, "User not found with given token.");
+                        return null; // Trả về null nếu không tìm thấy user với token
+                    }
+                });
+    }
 
-
-    // New method for username/password login
-    public void loginWithUsernameAndPassword(String username, String password, LoginCallback callback) {
+    //đăng nhập bằng username password
+    public void loginWithUsernameAndPassword(String username, String password, Callback callback) {
         dbContext.db.collection(dbContext.getUsersCollection())
                 .whereEqualTo("username", username)
                 .whereEqualTo("password", password)
@@ -206,39 +168,85 @@ public class UserController {
                     if (!querySnapshot.isEmpty()) {
                         DocumentSnapshot userDoc = querySnapshot.getDocuments().get(0);
                         User user = userDoc.toObject(User.class);
+
+                        // Kiểm tra xem dữ liệu User đã bao gồm thuộc tính role chưa
                         if (user != null) {
-                            // Update user's token
-                            String newToken = UUID.randomUUID().toString();
+
+                            // Set token mới và cập nhật tokenExpiredAt
+                            String newToken = TokenGen.getInstance().getRandomToken();
                             user.setToken(newToken);
 
-                            // Update token in database
-                            userDoc.getReference().update("token", newToken)
+                            // Tính ngày hết hạn của token
+                            int maxValidityDays = AppSetup.getInstance().getMaxTokenValidityDays();
+                            Date newExpirationDate = new Date(System.currentTimeMillis() + maxValidityDays * 24L * 60L * 60L * 1000L);
+                            user.setTokenExpiredAt(newExpirationDate);
+
+                            // Cập nhật token và ngày hết hạn trong cơ sở dữ liệu
+                            userDoc.getReference().update("token", newToken, "tokenExpiredAt", newExpirationDate)
                                     .addOnSuccessListener(aVoid -> {
-                                        sessionManager.saveUserInfo(user);
-                                        callback.onLoginSuccess(user);
-                                        Log.d(TAG, "User logged in successfully");
+                                        sessionManager.saveTEMPUserInfo(user);
+                                        callback.onSuccess(user);
+                                        Log.d(TAG, "User logged in successfully with role: " + user.getRole());
                                     })
                                     .addOnFailureListener(e -> {
                                         Log.e(TAG, "Token update error", e);
-                                        callback.onLoginFailed(e.getMessage());
+                                        callback.onFailed(e.getMessage());
                                     });
                         } else {
-                            callback.onLoginFailed("Failed to convert document to User object");
+                            callback.onFailed("Failed to convert document to User object.");
                         }
                     } else {
-                        callback.onLoginFailed("Invalid username or password");
+                        callback.onFailed("Invalid username or password.");
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Login error", e);
-                    callback.onLoginFailed(e.getMessage());
+                    callback.onFailed(e.getMessage());
+                });
+    }
+    //phương thức đăng nhâp dử dụng khi mở app nếu autologin true
+    public void loginWithUsernameAndToken(String username, String token, Callback callback) {
+        dbContext.db.collection(dbContext.getUsersCollection())
+                .whereEqualTo("username", username)
+                .whereEqualTo("token", token)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot userDoc = querySnapshot.getDocuments().get(0);
+                        User user = userDoc.toObject(User.class);
+                        if (user != null) {
+                            // Update user's token if needed
+                            if (!user.getToken().equals(token)) {
+                                user.setToken(token);
+                                userDoc.getReference().update("token", token)
+                                        .addOnSuccessListener(aVoid -> {
+                                            sessionManager.saveTEMPUserInfo(user);
+                                            callback.onSuccess(user);
+                                            Log.d(TAG, "User logged in successfully");
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e(TAG, "Token update error", e);
+                                            callback.onFailed(e.getMessage());
+                                        });
+                            } else {
+                                sessionManager.saveTEMPUserInfo(user);
+                                callback.onSuccess(user);
+                                Log.d(TAG, "User logged in successfully");
+                            }
+                        } else {
+                            callback.onFailed("Failed to convert document to User object");
+                        }
+                    } else {
+                        callback.onFailed("Invalid username or token");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Login error", e);
+                    callback.onFailed(e.getMessage());
                 });
     }
 
-    /**
-     * Fetches user details by username.
-     */
-    public Task<QuerySnapshot> getUserByToken(String token, LoginCallback callback) {
+    public Task<QuerySnapshot> getUserByToken(String token, Callback callback) {
         return DbContext.getInstance().db.collection(DbContext.getInstance().USERS_COLLECTION)
                 .whereEqualTo("token", token)
                 .get()
@@ -246,33 +254,30 @@ public class UserController {
                     if (!querySnapshot.isEmpty()) {
                         DocumentSnapshot userDoc = querySnapshot.getDocuments().get(0);
                         User user = userDoc.toObject(User.class);
-                        callback.onLoginSuccess(user);
+                        callback.onSuccess(user);
                     } else {
-                        callback.onLoginFailed("User not found");
+                        callback.onFailed("User not found");
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error getting user by token", e);
-                    callback.onLoginFailed(e.getMessage());
+                    callback.onFailed(e.getMessage());
                 });
     }
-    /**
-     * Logs out the current user by clearing session information.
-     */
-    public void logout() {
+
+    //hàm này sẽ xóa các thông tin trong SharedPreferences
+    public void logout(CallLogOut callLogOut) {
+        //được thêm interface để nhắc cua cua sẽ nhớ thêm cái GoLoginMenu vào đây
         sessionManager.logoutUser();
         Log.d(TAG, "User logged out successfully");
+
     }
-    // New callback interface for registration
-    public interface RegisterCallback {
-        void onRegisterSuccess(User user);
-        void onRegisterFailed(String errorMessage);
+
+    public interface Callback {
+        void onSuccess(User user);
+        void onFailed(String errorMessage);
     }
-    /**
-     * Callback interface for login success or failure.
-     */
-    public interface LoginCallback {
-        void onLoginSuccess(User user);
-        void onLoginFailed(String errorMessage);
+    public interface CallLogOut{
+        void GoLoginMenu();
     }
 }

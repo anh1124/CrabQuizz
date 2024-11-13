@@ -86,9 +86,9 @@ public class Register extends AppCompatActivity {
                                 Boolean isUnique = task.getResult();
                                 if (isUnique) {
                                     // Email duy nhất
-                                    UserController.getInstance(sessionManager).register(fullName, userName, password, isTeacher ? "teacher" : "student", email, new UserController.RegisterCallback() {
+                                    UserController.getInstance(sessionManager).register(fullName, userName, password, isTeacher ? "teacher" : "student", email, new UserController.Callback() {
                                         @Override
-                                        public void onRegisterSuccess(User user) {
+                                        public void onSuccess(User user) {
                                             // Nếu đăng ký thành công- chuyển sang màn hình đăng nhập
 
                                             GoLoginActive();
@@ -97,7 +97,7 @@ public class Register extends AppCompatActivity {
                                         }
 
                                         @Override
-                                        public void onRegisterFailed(String errorMessage) {
+                                        public void onFailed(String errorMessage) {
                                             // Registration failed, display the error message
                                             Log.e("Register", "User registration failed: " + errorMessage);
 

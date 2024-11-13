@@ -15,9 +15,6 @@ public class User {
     private Date tokenExpiredAt;
     // </editor-fold>
 
-
-    // Empty constructor required for Firestore
-
     // Empty constructor required for Firestore
     public User() {}
 
@@ -78,7 +75,7 @@ public class User {
     }
 
     public void setRole(String role) {
-        this.token = role;
+        this.role = role;
     }
 
 

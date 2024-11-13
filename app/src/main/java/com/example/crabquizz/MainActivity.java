@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private DbContext dbContext;
     private SessionManager sessionManager;
 
+    public boolean autologin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,12 +38,17 @@ public class MainActivity extends AppCompatActivity {
 
 
         GetAppSetUp();//đã cật nhật ngày hết hạn token
+        CleanUserSession();//xóa session tạm thời  ngay khi mở app
 
-        CheckAutoAndLoginIfAble();//kiểm tra biến auto loggin và thực hiện login nếu có thể
+        CheckAutoAndLoginIfAble();//kiểm tra biến auto login và thực hiện login nếu có thể
 
         /*
-            khi chuyển sang khác ,sẽ có 1 thông báo là bạn chưa đăng nhập,vui lòng đăng nhập vì sau khi thoát sẽ mất hết data
+            khi chuyển sang các màn hình khác ,sẽ có 1 thông báo là bạn chưa đăng nhập,vui lòng đăng nhập vì sau khi thoát sẽ mất hết data
         */
+    }
+
+    private void CleanUserSession() {
+        sessionManager.clearUserSessionInSessionManager();
     }
 
     private void CheckAutoAndLoginIfAble() {
@@ -80,10 +87,10 @@ public class MainActivity extends AppCompatActivity {
             String username = sessionManager.getSharedPreferencesUsername();
             String token = sessionManager.getSharedPreferencesToken();
 
-            UserController.getInstance(sessionManager).loginWithUsernameAndToken(username, token, new UserController.LoginCallback() {
+            UserController.getInstance(sessionManager).loginWithUsernameAndToken(username, token, new UserController.Callback() {
                 //2 cái cục override bên dưới là interface callback
                 @Override
-                public void onLoginSuccess(User user) {
+                public void onSuccess(User user) {
                     // User logged in successfully
                     Log.d("MainActivity", "User logged in successfully");
                     startActivity(new Intent(MainActivity.this, HomeScreen.class));
@@ -91,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onLoginFailed(String errorMessage) {
+                public void onFailed(String errorMessage) {
                     // Login failed
                     Log.e("MainActivity", "Login failed: " + errorMessage);
                     Toast.makeText(MainActivity.this, "Login failed: " + errorMessage, Toast.LENGTH_SHORT).show();

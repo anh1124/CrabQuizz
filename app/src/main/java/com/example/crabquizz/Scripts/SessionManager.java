@@ -2,6 +2,7 @@ package com.example.crabquizz.Scripts;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.crabquizz.Scripts.Models.User;
 import com.google.gson.Gson;
@@ -22,15 +23,33 @@ public class SessionManager {
     private static final String KEY_USER_SESSION = "userSession";   // Thông tin phiên làm việc
     private static final String KEY_AUTO_LOGIN = "autoLoginEnabled"; // Trạng thái tự động đăng nhập
     private static final String KEY_TOKEN_EXPIRED_AT = "tokenExpiredAt";
+    public void PrintSharedPreferencesLog() {
+        // Lấy dữ liệu từ SharedPreferences
+        String username = sharedPreferences.getString(KEY_USERNAME, "N/A");
+        String fullName = sharedPreferences.getString(KEY_FULLNAME, "N/A");
+        String token = sharedPreferences.getString(KEY_TOKEN, "N/A");
+        String userRole = sharedPreferences.getString(KEY_USER_ROLE, "N/A");
+        boolean autoLoginEnabled = sharedPreferences.getBoolean(KEY_AUTO_LOGIN, false);
+        String tokenExpiredAt = sharedPreferences.getString(KEY_TOKEN_EXPIRED_AT, "N/A");
+
+        // In log các thông tin lấy được
+        Log.d("LOGDATA", "SharedPreferences Log:");
+        Log.d("LOGDATA", "Username: " + username);
+        Log.d("LOGDATA", "Full Name: " + fullName);
+        Log.d("LOGDATA", "Token: " + token);
+        Log.d("LOGDATA", "User Role: " + userRole);
+        Log.d("LOGDATA", "Auto Login Enabled: " + autoLoginEnabled);
+        Log.d("LOGDATA", "Token Expired At: " + tokenExpiredAt);
+    }
 
     // Các biến instance để quản lý dữ liệu
     private SharedPreferences sharedPreferences;                    // Đối tượng lưu trữ dữ liệu vĩnh viễn
     private SharedPreferences.Editor editor;                        // Đối tượng chỉnh sửa SharedPreferences
     private boolean autoLoginEnabled;                               // Trạng thái tự động đăng nhập
-    private UserSession userSession;                                // Thông tin phiên làm việc hiện tại
+    private UserTEMPSession userTEMPSession;                                // Thông tin phiên làm việc hiện tại
 
     // Lớp inner class để lưu trữ thông tin phiên làm việc tạm thời
-    public static class UserSession {
+    public static class UserTEMPSession {
         private User user;
 
         // Lấy thông tin người dùng trong phiên
@@ -42,6 +61,52 @@ public class SessionManager {
         public void setUser(User user) {
             this.user = user;
         }
+
+        // Hàm in ra log các thông tin của người dùng hiện tại
+        public void printUserSessionLog() {
+            if (user != null) {
+                Log.d("LOGDATA", "User Session Log:");
+                Log.d("LOGDATA", "Username: " + user.getUsername());
+                Log.d("LOGDATA", "Full Name: " + user.getFullName());
+                Log.d("LOGDATA", "Token: " + user.getToken());
+                Log.d("LOGDATA", "User Role: " + user.getRole());
+            } else {
+                Log.d("LOGDATA", "User session is empty. No user information available.");
+            }
+        }
+
+        //hàm xóa thông tin phiên làm việc tạm thời
+        public void clearUserSession() {
+            user = null;
+        }
+
+        public void newUserSession(){user = new User();}
+    }
+    public void showLogUserData()
+    {
+        Log.d("LOGDATA", "LOG:");
+        printUserTEMPSessionLog();
+        PrintSharedPreferencesLog();
+    }
+    //nếu lỗi khi chạy thì tại hàm này set userSession .
+    public void clearUserSessionInSessionManager()
+    {
+        if (userTEMPSession != null) {
+            userTEMPSession.clearUserSession();
+            userTEMPSession.newUserSession();
+            Log.d("clearUserSessionInSessionManager", "has delete temp user session and make new 1");
+        }
+        else
+        {
+            Log.d("clearUserSessionInSessionManager", "temp User session is null or empty. No user information available.");
+        }
+    }
+    public void printUserTEMPSessionLog() {
+        if (userTEMPSession != null && userTEMPSession.getUser() != null) {
+            userTEMPSession.printUserSessionLog();
+        } else {
+            Log.d("SessionManager", "User session is empty. No user information available.");
+        }
     }
 
     // Constructor private để thực hiện Singleton pattern
@@ -49,7 +114,6 @@ public class SessionManager {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
     }
-
     // Phương thức lấy instance duy nhất của SessionManager
     public static synchronized SessionManager getInstance(Context context) {
         if (instance == null) {
@@ -57,18 +121,10 @@ public class SessionManager {
         }
         return instance;
     }
+
     //=========================================================================
     // NHÓM PHƯƠNG THỨC QUẢN LÝ SAVE
     //=========================================================================
-
-    /**
-     * Tạo phiên đăng nhập mới cho người dùng
-     * @param username  Tên đăng nhập
-     * @param fullname  Tên đầy đủ
-     * @param token     Token xác thực
-     * @param userRole  Vai trò người dùng
-     * @param autoLogin Bật/tắt tự động đăng nhập
-     */
     //lưu thông tin cơ bản của người hiện tại vừa đăng nhập
     public void createLoginSession(String username, String fullname, String token, String userRole, boolean autoLogin) {
         editor.putString(KEY_USERNAME, username);
@@ -78,45 +134,27 @@ public class SessionManager {
         setAutoLoginEnabled(autoLogin);
         editor.commit();
     }
-
     /**
-     * Đăng xuất người dùng và xóa toàn bộ dữ liệu đã lưu
+     * Đăng xuất người dùng và xóa toàn bộ dữ liệu đã lưu trong sharedPreferences
      */
     public void logoutUser() {
         editor.clear();
         editor.commit();
     }
-
     //=========================================================================
     // NHÓM PHƯƠNG THỨC QUẢN LÝ TỰ ĐỘNG ĐĂNG NHẬP
     //=========================================================================
-
-    /**
-     * Kiểm tra trạng thái tự động đăng nhập
-     * @return true nếu tự động đăng nhập được bật
-     */
     public boolean isAutoLoginEnabled() {
         return sharedPreferences.getBoolean(KEY_AUTO_LOGIN, false);
     }
-
-    /**
-     * Cập nhật trạng thái tự động đăng nhập
-     * @param enabled true để bật tự động đăng nhập
-     */
     public void setAutoLoginEnabled(boolean enabled) {
         autoLoginEnabled = enabled;
         editor.putBoolean(KEY_AUTO_LOGIN, enabled);
         editor.commit();
     }
-
     //=========================================================================
     // NHÓM PHƯƠNG THỨC KIỂM TRA TRẠNG THÁI PHIÊN khi app bắt đầu
     //=========================================================================
-
-    /**
-     * Kiểm tra token xác thực còn tồn tại hay không
-     * @return true nếu token còn tồn tại
-     */
     public boolean isHaveToken() {
         String token = sharedPreferences.getString(KEY_TOKEN, null);
         if (token == null) {
@@ -125,11 +163,6 @@ public class SessionManager {
         }
         return true;
     }
-
-    /**
-     * Kiểm tra username còn tồn tại hay không
-     * @return true nếu username còn tồn tại
-     */
     public boolean isHaveUsername() {
         String username = sharedPreferences.getString(KEY_USERNAME, null);
         if (username == null) {
@@ -138,33 +171,17 @@ public class SessionManager {
         }
         return true;
     }
-
     //=========================================================================
     // NHÓM PHƯƠNG THỨC LẤY THÔNG TIN CƠ BẢN trong sharedPreferences
     //=========================================================================
-
-    /**
-     * Lấy tên đăng nhập của người dùng
-     * @return tên đăng nhập hoặc null nếu chưa đăng nhập
-     */
     public String getSharedPreferencesUsername() {
         return sharedPreferences.getString(KEY_USERNAME, null);
     }
-
-    /**
-     * Lấy token xác thực của người dùng
-     * @return token hoặc null nếu chưa đăng nhập
-     */
     public String getSharedPreferencesToken() {
         return sharedPreferences.getString(KEY_TOKEN, null);
     }
-
-    /**
-     * Lấy toàn bộ thông tin chi tiết của người dùng
-     * @return đối tượng UserSession chứa thông tin người dùng
-     */
-    public UserSession getSharedPreferencesUserDetails() {
-        UserSession session = new UserSession();
+    public UserTEMPSession getSharedPreferencesUserDetails() {
+        UserTEMPSession session = new UserTEMPSession();
         session.setUser(new User(
                 sharedPreferences.getString(KEY_FULLNAME, null),
                 sharedPreferences.getString(KEY_USERNAME, null),
@@ -173,21 +190,14 @@ public class SessionManager {
         ));
         return session;
     }
-
     //=========================================================================
     // NHÓM PHƯƠNG THỨC QUẢN LÝ PHIÊN LÀM VIỆC tạm thời
     //=========================================================================
-
-    /**
-     * Lưu thông tin người dùng vào phiên làm việc
-     * @param user đối tượng User chứa thông tin cần lưu
-     */
-    public void saveUserInfo(User user) {
-        if (userSession == null) {
-            userSession = new UserSession();
+    public void saveTEMPUserInfo(User user) {
+        if (userTEMPSession == null) {
+            userTEMPSession = new UserTEMPSession();
         }
-
-        userSession.setUser(user);
+        userTEMPSession.setUser(user);
 
         Gson gson = new Gson();
         String userJson = gson.toJson(user);
@@ -195,49 +205,34 @@ public class SessionManager {
         editor.putString(KEY_USER_SESSION, userJson);
         editor.commit();
     }
-
     public void saveGuessSession(User guestUser) {
-        if (userSession == null) {
-            userSession = new UserSession();
+        if (userTEMPSession == null) {
+            userTEMPSession = new UserTEMPSession();
         }
-        userSession.setUser(guestUser);
+        userTEMPSession.setUser(guestUser);
         // Note: No SharedPreferences storage for guest session, only temporary in-memory storage
     }
-
-    /**
-     * Lấy thông tin phiên làm việc hiện tại
-     * @return đối tượng UserSession chứa thông tin phiên
-     */
-    public UserSession getUserSession() {
-        if (userSession.user == null) {
+    public UserTEMPSession getUserSession() {
+        if (userTEMPSession.user == null) {
             String userSessionData = sharedPreferences.getString(KEY_USER_SESSION, null);
             if (userSessionData != null) {
                 Gson gson = new Gson();
                 User user = gson.fromJson(userSessionData, User.class);
 
-                userSession = new UserSession();
-                userSession.setUser(user);
+                userTEMPSession = new UserTEMPSession();
+                userTEMPSession.setUser(user);
             }
         }
-        return userSession;
+        return userTEMPSession;
     }
-
-    /**
-     * Xóa thông tin phiên làm việc hiện tại
-     */
     public void clearUserSession() {
-        userSession = null;
+        userTEMPSession = null;
         editor.remove(KEY_USER_SESSION);
         editor.commit();
     }
-
     //=========================================================================
     // PHƯƠNG THỨC TIỆN ÍCH
     //=========================================================================
-
-    /**
-     * Xóa toàn bộ dữ liệu trong SharedPreferences
-     */
     private void deleteSharedPreferences() {
         editor.clear().commit();
     }
