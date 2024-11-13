@@ -42,7 +42,9 @@ public class HomeScreen extends AppCompatActivity {
         SetGreeting();
         ShowLoginSignupButton();
     }
-
+    public void demoGetUsernameInTempUserSession(){
+        SessionManager.getInstance(this).getUserSession().getUser().getUsername();
+    }
     private void ShowLoginSignupButton() {
         SessionManager.UserTEMPSession userSession = SessionManager.getInstance(this).getUserSession();
 

@@ -1,5 +1,6 @@
 package com.example.crabquizz.Scripts.Controller;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,47 +22,68 @@ public class MenuNavigationClickController {
         this.context = context;
     }
 
-    private void saveCurrentScreen(int screenId) {
-        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        prefs.edit().putInt(CURRENT_SCREEN_KEY, screenId).apply();
-    }
-
-    private int getCurrentScreen() {
-        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        return prefs.getInt(CURRENT_SCREEN_KEY, R.id.home);
-    }
-
     public void setUpAndHandleBottomNavigationView(View rootView) {
         BottomNavigationView bottomNavigationView = rootView.findViewById(R.id.bottomNavigation);
 
-        // Thiết lập selected item dựa trên giá trị đã lưu
-        bottomNavigationView.setSelectedItemId(getCurrentScreen());
+        // Set selected tab dựa theo màn hình hiện tại
+        if (context instanceof HomeScreen) {
+            bottomNavigationView.setSelectedItemId(R.id.home);
+            saveCurrentScreen(R.id.home);
+        } else if (context instanceof SearchScreen) {
+            bottomNavigationView.setSelectedItemId(R.id.search);
+            saveCurrentScreen(R.id.search);
+        } else if (context instanceof QuestionScreen) {
+            bottomNavigationView.setSelectedItemId(R.id.question);
+            saveCurrentScreen(R.id.question);
+        } else if (context instanceof ProfileScreen) {
+            bottomNavigationView.setSelectedItemId(R.id.profile);
+            saveCurrentScreen(R.id.profile);
+        }
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId != getCurrentScreen()) {
-                switch (itemId) {
-                    case R.id.home:
+            Intent intent = null;
+
+            switch (itemId) {
+                case R.id.home:
+                    if (!(context instanceof HomeScreen)) {
+                        intent = new Intent(context, HomeScreen.class);
                         saveCurrentScreen(R.id.home);
-                        context.startActivity(new Intent(context, HomeScreen.class));
-                        return true;
-                    case R.id.search:
+                    }
+                    break;
+                case R.id.search:
+                    if (!(context instanceof SearchScreen)) {
+                        intent = new Intent(context, SearchScreen.class);
                         saveCurrentScreen(R.id.search);
-                        context.startActivity(new Intent(context, SearchScreen.class));
-                        return true;
-                    case R.id.question:
+                    }
+                    break;
+                case R.id.question:
+                    if (!(context instanceof QuestionScreen)) {
+                        intent = new Intent(context, QuestionScreen.class);
                         saveCurrentScreen(R.id.question);
-                        context.startActivity(new Intent(context, QuestionScreen.class));
-                        return true;
-                    case R.id.profile:
+                    }
+                    break;
+                case R.id.profile:
+                    if (!(context instanceof ProfileScreen)) {
+                        intent = new Intent(context, ProfileScreen.class);
                         saveCurrentScreen(R.id.profile);
-                        context.startActivity(new Intent(context, ProfileScreen.class));
-                        return true;
-                    default:
-                        return false;
+                    }
+                    break;
+            }
+
+            if (intent != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                context.startActivity(intent);
+                if (context instanceof Activity) {
+                    ((Activity) context).finish();
                 }
             }
             return true;
         });
+    }
+
+    private void saveCurrentScreen(int screenId) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putInt(CURRENT_SCREEN_KEY, screenId).apply();
     }
 }

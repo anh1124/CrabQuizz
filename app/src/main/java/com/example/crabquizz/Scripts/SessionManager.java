@@ -65,7 +65,7 @@ public class SessionManager {
         // Hàm in ra log các thông tin của người dùng hiện tại
         public void printUserSessionLog() {
             if (user != null) {
-                Log.d("LOGDATA", "User Session Log:");
+                Log.d("LOGDATA", "User TEMP Session Log:");
                 Log.d("LOGDATA", "Username: " + user.getUsername());
                 Log.d("LOGDATA", "Full Name: " + user.getFullName());
                 Log.d("LOGDATA", "Token: " + user.getToken());
