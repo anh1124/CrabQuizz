@@ -5,18 +5,15 @@ import com.example.crabquizz.Scripts.Controller.UserController;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.User;
 import com.example.crabquizz.Scripts.SessionManager;
+import com.example.crabquizz.Scripts.Models.AppSetup;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 //active này sẽ khởi chạy đầu tiên
 //chức năng là kiểm tra trong sharedPreferences xem có token và username có không
@@ -25,9 +22,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 
 public class MainActivity extends AppCompatActivity {
-    private TextView adminDataTextView;
     private DbContext dbContext;
     private SessionManager sessionManager;
+
+    public boolean autologin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,84 +33,79 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        //bắt đầu ở đây
-
         initPackage();
         initViews();
 
-        //thử đăng nhập bằng token nếu có trong sharedPreferences
-       TryloginWithUsernameAndTokenSharedPreferences();
+
+        GetAppSetUp();//đã cật nhật ngày hết hạn token
+        CleanUserSession();//xóa session tạm thời  ngay khi mở app
+
+        CheckAutoAndLoginIfAble();//kiểm tra biến auto login và thực hiện login nếu có thể
+
+        /*
+            khi chuyển sang các màn hình khác ,sẽ có 1 thông báo là bạn chưa đăng nhập,vui lòng đăng nhập vì sau khi thoát sẽ mất hết data
+        */
     }
+
+    private void CleanUserSession() {
+        sessionManager.clearUserSessionInSessionManager();
+    }
+
+    private void CheckAutoAndLoginIfAble() {
+        //nếu tự động login được bật thì chạy hàm này
+        if(SessionManager.getInstance(this).isAutoLoginEnabled())
+        {
+            TryloginWithUsernameAndTokenSharedPreferences();
+        }
+        else
+        {
+
+            //nếu autologin không được bật,bắt đầu với tài khoản guess của học sinh
+            createGuestUserSession();
+        }
+
+    }
+    private void createGuestUserSession() {
+        User guestUser = new User(0,"Guest", "guest", null, "guess", null, null, null);
+        sessionManager.saveGuessSession(guestUser);
+        sessionManager.createLoginSession("guest", "Guest", null, "guess", false);
+
+        Toast.makeText(MainActivity.this,
+                "Chế độ khách đã được kích hoạt.",
+                Toast.LENGTH_SHORT).show();
+
+        startActivity(new Intent(MainActivity.this, HomeScreen.class));
+        finish();
+    }
+    private void GetAppSetUp() {
+        AppSetup.getInstance().Setup();
+    }
+
+
     private void TryloginWithUsernameAndTokenSharedPreferences() {
-        // Nếu có cả token và username
         if (sessionManager.isHaveToken() && sessionManager.isHaveUsername()) {
-            String username = sessionManager.getUsername();
-            String token = sessionManager.getToken();
+            String username = sessionManager.getSharedPreferencesUsername();
+            String token = sessionManager.getSharedPreferencesToken();
 
-            Toast.makeText(MainActivity.this,
-                    "Đang kiểm tra thông tin đăng nhập...",
-                    Toast.LENGTH_SHORT).show();
+            UserController.getInstance(sessionManager).loginWithUsernameAndToken(username, token, new UserController.Callback() {
+                //2 cái cục override bên dưới là interface callback
+                @Override
+                public void onSuccess(User user) {
+                    // User logged in successfully
+                    Log.d("MainActivity", "User logged in successfully");
+                    startActivity(new Intent(MainActivity.this, HomeScreen.class));
+                    finish();
+                }
 
-            // Kiểm tra user với username và token
-            dbContext.getUserByUsernameAndToken(username, token)
-                    .addOnSuccessListener(querySnapshot -> {
-                        if (!querySnapshot.isEmpty()) {
-                            // Tìm thấy user, tiếp tục lấy thông tin chi tiết
-                            UserController.getInstance(sessionManager).getUserByUsername(username, new UserController.LoginCallback() {
-                                @Override
-                                public void onLoginSuccess(User user) {
-                                    runOnUiThread(() -> {
-                                        Toast.makeText(MainActivity.this,
-                                                "Đăng nhập thành công! Xin chào " + user.getFullName(),
-                                                Toast.LENGTH_SHORT).show();
-                                    });
-
-                                    sessionManager.saveUserInfo(user);
-                                    sessionManager.createLoginSession(user.getUsername(), user.getFullName(), user.getToken(), user.getToken());
-                                    startActivity(new Intent(MainActivity.this, HomeScreen.class));
-                                    finish();
-                                }
-
-                                @Override
-                                public void onLoginFailed(String errorMessage) {
-                                    runOnUiThread(() -> {
-                                        Toast.makeText(MainActivity.this,
-                                                "Đăng nhập thất bại: " + errorMessage,
-                                                Toast.LENGTH_SHORT).show();
-                                    });
-                                    sessionManager.clearUserSession();
-                                    sessionManager.logoutUser();
-                                    startActivity(new Intent(MainActivity.this, HomeScreen.class));
-                                    finish();
-                                }
-                            });
-                        } else {
-                            // Không tìm thấy user
-                            Toast.makeText(MainActivity.this,
-                                    "Không tìm thấy thông tin đăng nhập",
-                                    Toast.LENGTH_SHORT).show();
-
-                            sessionManager.logoutUser();
-                            startActivity(new Intent(MainActivity.this, HomeScreen.class));
-                            finish();
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("MainActivity", "Error verifying user", e);
-                        Toast.makeText(MainActivity.this,
-                                "Lỗi khi kiểm tra thông tin: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show();
-
-                        sessionManager.logoutUser();
-                        startActivity(new Intent(MainActivity.this, HomeScreen.class));
-                        finish();
-                    });
+                @Override
+                public void onFailed(String errorMessage) {
+                    // Login failed
+                    Log.e("MainActivity", "Login failed: " + errorMessage);
+                    Toast.makeText(MainActivity.this, "Login failed: " + errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
-            // Không có token hoặc username
-            Toast.makeText(MainActivity.this,
-                    "Chưa có thông tin đăng nhập",
-                    Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(MainActivity.this, "Chưa có thông tin đăng nhập", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MainActivity.this, HomeScreen.class));
             finish();
         }
