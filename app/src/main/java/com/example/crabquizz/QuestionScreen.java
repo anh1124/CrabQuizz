@@ -18,7 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class QuestionScreen extends AppCompatActivity {
      Button button2;
-     TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +30,6 @@ public class QuestionScreen extends AppCompatActivity {
             return insets;
         });
         button2 = (Button) findViewById(R.id.button2);
-        textView = (TextView) findViewById(R.id.textView);
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

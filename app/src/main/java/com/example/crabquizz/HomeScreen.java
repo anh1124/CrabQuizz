@@ -46,7 +46,6 @@ public class HomeScreen extends AppCompatActivity {
         // Truyền view của bottom navigation
         controller.setUpAndHandleBottomNavigationView(findViewById(R.id.bottomNavigation));
     }
-
     private void ShowLoginSignupButton() {
         SessionManager.UserTEMPSession userSession = SessionManager.getInstance(this).getUserSession();
 
