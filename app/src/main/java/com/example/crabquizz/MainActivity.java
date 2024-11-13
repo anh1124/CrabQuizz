@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private DbContext dbContext;
     private SessionManager sessionManager;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

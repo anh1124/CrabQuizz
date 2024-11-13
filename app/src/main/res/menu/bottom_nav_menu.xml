@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navigation_home"
-
+        android:id="@+id/home"
+        android:icon="@drawable/ic_home"
         android:title="Trang chủ" />
 
     <item
-        android:id="@+id/navigation_search"
-
+        android:id="@+id/search"
+        android:icon="@drawable/ic_search"
         android:title="Tìm kiếm" />
 
     <item
-        android:id="@+id/navigation_results"
-
-        android:title="Kết quả" />
+        android:id="@+id/question"
+        android:icon="@drawable/ic_question"
+        android:title="Câu hỏi" />
 
     <item
-        android:id="@+id/navigation_profile"
-
-        android:title="Cá nhân" />
+        android:id="@+id/profile"
+        android:icon="@drawable/ic_setting"
+        android:title="Tài Khoản" />
 </menu>
