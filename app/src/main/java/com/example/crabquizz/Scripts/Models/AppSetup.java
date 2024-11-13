@@ -1,9 +1,7 @@
 package com.example.crabquizz.Scripts.Models;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.example.crabquizz.Scripts.SessionManager;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnFailureListener;
 

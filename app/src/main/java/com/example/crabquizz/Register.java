@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.example.crabquizz.Scripts.Controller.UserController;
 import com.example.crabquizz.Scripts.Models.DbContext;
-import com.example.crabquizz.Scripts.SessionManager;
+import com.example.crabquizz.Scripts.Controller.SessionManager;
 import com.example.crabquizz.Scripts.Models.User;
 
 public class Register extends AppCompatActivity {

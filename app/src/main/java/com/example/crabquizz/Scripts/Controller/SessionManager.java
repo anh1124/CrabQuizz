@@ -1,4 +1,4 @@
-package com.example.crabquizz.Scripts;
+package com.example.crabquizz.Scripts.Controller;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -76,8 +76,11 @@ public class SessionManager {
         }
 
         //hàm xóa thông tin phiên làm việc tạm thời
-        public void clearUserSession() {
+        public void clearSession() {
             user = null;
+            user = new User();
+            user.setRole("guess");
+            user.setFullName("guess");
         }
 
         public void newUserSession(){user = new User();}
@@ -92,7 +95,7 @@ public class SessionManager {
     public void clearUserSessionInSessionManager()
     {
         if (userTEMPSession != null) {
-            userTEMPSession.clearUserSession();
+            userTEMPSession.clearSession();
             userTEMPSession.newUserSession();
             Log.d("clearUserSessionInSessionManager", "has delete temp user session and make new 1");
         }
@@ -126,7 +129,7 @@ public class SessionManager {
     // NHÓM PHƯƠNG THỨC QUẢN LÝ SAVE
     //=========================================================================
     //lưu thông tin cơ bản của người hiện tại vừa đăng nhập
-    public void createLoginSession(String username, String fullname, String token, String userRole, boolean autoLogin) {
+    public void SaveLoginSession(String username, String fullname, String token, String userRole, boolean autoLogin) {
         editor.putString(KEY_USERNAME, username);
         editor.putString(KEY_FULLNAME, fullname);
         editor.putString(KEY_TOKEN, token);
@@ -140,6 +143,7 @@ public class SessionManager {
     public void logoutUser() {
         editor.clear();
         editor.commit();
+        clearTEMPUserAndsharedPreferencesSession();
     }
     //=========================================================================
     // NHÓM PHƯƠNG THỨC QUẢN LÝ TỰ ĐỘNG ĐĂNG NHẬP
@@ -225,8 +229,8 @@ public class SessionManager {
         }
         return userTEMPSession;
     }
-    public void clearUserSession() {
-        userTEMPSession = null;
+    public void clearTEMPUserAndsharedPreferencesSession() {
+        userTEMPSession.clearSession();
         editor.remove(KEY_USER_SESSION);
         editor.commit();
     }
