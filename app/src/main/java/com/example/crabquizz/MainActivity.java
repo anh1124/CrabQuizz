@@ -4,7 +4,7 @@ package com.example.crabquizz;
 import com.example.crabquizz.Scripts.Controller.UserController;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.User;
-import com.example.crabquizz.Scripts.SessionManager;
+import com.example.crabquizz.Scripts.Controller.SessionManager;
 import com.example.crabquizz.Scripts.Models.AppSetup;
 
 import android.content.Intent;
@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         }
         else
         {
-
             //nếu autologin không được bật,bắt đầu với tài khoản guess của học sinh
             createGuestUserSession();
         }
@@ -68,12 +67,10 @@ public class MainActivity extends AppCompatActivity {
     private void createGuestUserSession() {
         User guestUser = new User(0,"Guest", "guest", null, "guess", null, null, null);
         sessionManager.saveGuessSession(guestUser);
-        sessionManager.createLoginSession("guest", "Guest", null, "guess", false);
-
+        sessionManager.SaveLoginSession("guest", "Guest", null, "guess", false);
         Toast.makeText(MainActivity.this,
                 "Chế độ khách đã được kích hoạt.",
                 Toast.LENGTH_SHORT).show();
-
         startActivity(new Intent(MainActivity.this, HomeScreen.class));
         finish();
     }

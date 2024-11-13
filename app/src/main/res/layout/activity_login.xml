@@ -62,10 +62,10 @@
             android:text="Login" />
 
         <CheckBox
-            android:id="@+id/checkBoxRememberMe"
+            android:id="@+id/checkBoxAutoLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="CheckBox" />
+            android:text="Auto login next time" />
 
         <LinearLayout
             android:layout_width="match_parent"

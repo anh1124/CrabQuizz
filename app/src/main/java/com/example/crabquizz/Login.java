@@ -17,7 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.crabquizz.Scripts.Controller.UserController;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.User;
-import com.example.crabquizz.Scripts.SessionManager;
+import com.example.crabquizz.Scripts.Controller.SessionManager;
 
 public class Login extends AppCompatActivity {
 
@@ -28,7 +28,7 @@ public class Login extends AppCompatActivity {
     public Button buttonBackToMainMenu, buttonlogin;
     public EditText TextInputEditTextPassword, TextInputEditTextUserName;
     public TextView textViewBtnGoRegister;
-    public CheckBox checkBoxRememberMe;
+    public CheckBox checkBoxAutoLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class Login extends AppCompatActivity {
         TextInputEditTextPassword =findViewById(R.id.TextInputEditTextPassword);
         TextInputEditTextUserName =findViewById(R.id.TextInputEditTextUserName);
         textViewBtnGoRegister = findViewById(R.id.textViewBtnGoLogin);
-        checkBoxRememberMe = findViewById(R.id.checkBoxRememberMe);
+        checkBoxAutoLogin = findViewById(R.id.checkBoxAutoLogin);
 
         buttonBackToMainMenu.setOnClickListener(v -> {
             GoHomeActive();
@@ -94,7 +94,6 @@ public class Login extends AppCompatActivity {
                     CallWhenLoginFalse();
                 }
             });
-
         }
     }
 
@@ -133,23 +132,21 @@ public class Login extends AppCompatActivity {
         sessionManager.saveTEMPUserInfo(currentUser);
         // Log thông tin người dùng
         sessionManager.showLogUserData();
+        //lưu lại thông tin vào sharedPreferences nếu autoLogin được chọn
+        if (checkBoxAutoLogin.isChecked()) {
+            DoAutoLogin(currentUser);
+        }
         GoHomeActive();
     }
 
-
-
-    /*
-    đang làm hàm truyền token vào để lấy user ,sau đó truyền cái user này cho user temp để lấy data
-    * */
-    public void IsRememberMe(String token, User user) {
-        boolean rememberMe = checkBoxRememberMe.isChecked();
-
-        if (rememberMe) {
-            // Nếu Remember Me được chọn, lưu thông tin người dùng vào SharedPreferences
-            sessionManager.createLoginSession(
+    public void DoAutoLogin(User user) {
+        boolean autoLoginChecked = checkBoxAutoLogin.isChecked();
+        if (autoLoginChecked) {
+            // Nếu autoLoginChecked Me được chọn, lưu thông tin người dùng vào SharedPreferences
+            sessionManager.SaveLoginSession(
                     user.getUsername(),
                     user.getFullName(),
-                    token,
+                    user.getToken(),
                     user.getRole(),
                     true
             );
