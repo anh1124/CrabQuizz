@@ -69,7 +69,7 @@ public class Register extends AppCompatActivity {
 
         // Optional: set click listeners for buttons and clickable text
         buttonBackToMainMenu.setOnClickListener(v -> {
-            Intent intent = new Intent(Register.this, HomeScreen.class);
+            Intent intent = new Intent(Register.this, HomeFragment.class);
             startActivity(intent);
         });
 

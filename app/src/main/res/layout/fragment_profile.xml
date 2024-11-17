@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileScreen">
+    tools:context=".ProfileFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,21 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="LOGOUT"
-            android:textColor="@color/red"
-            />
+            android:textColor="@color/red" />
     </LinearLayout>
 
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:elevation="8dp"
-        app:itemIconTint="@color/selector_bottom_nav"
-        app:itemRippleColor="@color/ripple_effect_color"
-        app:itemTextColor="@color/selector_bottom_nav"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -72,7 +72,7 @@ public class Login extends AppCompatActivity {
     }
 
     private void GoHomeActive() {
-        Intent intent = new Intent(Login.this, HomeScreen.class);
+        Intent intent = new Intent(Login.this, HomeFragment.class);
         startActivity(intent);
     }
 

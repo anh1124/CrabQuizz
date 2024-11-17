@@ -15,6 +15,9 @@
         android:theme="@style/Theme.CrabQuizz"
         tools:targetApi="31">
         <activity
+            android:name=".ClassScreen"
+            android:exported="false" />
+        <activity
             android:name=".SearchScreen"
             android:exported="false" />
         <activity

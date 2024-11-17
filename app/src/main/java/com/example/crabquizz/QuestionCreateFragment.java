@@ -1,33 +1,36 @@
 package com.example.crabquizz;
 
+import static com.example.crabquizz.R.id.studentBottomNavigation;
+
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
 import com.example.crabquizz.Scripts.Controller.MenuNavigationClickController;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.Question;
 import com.example.crabquizz.Scripts.Models.QuestionPack;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
-public class QuestionCreateScreen extends AppCompatActivity {
+public class QuestionCreateFragment extends Fragment {
     private FirebaseDatabase database;
     private DatabaseReference questionsRef;
     private DbContext dbContext;
@@ -42,7 +45,6 @@ public class QuestionCreateScreen extends AppCompatActivity {
     private TextInputEditText questionInput;
     private TextInputEditText optionAInput, optionBInput, optionCInput, optionDInput;
     private RadioGroup correctAnswerGroup;
-    private Button saveButton;
     private ImageButton addQuestionButton, deleteQuestionButton;
     private TextView questionNumber;
 
@@ -52,47 +54,74 @@ public class QuestionCreateScreen extends AppCompatActivity {
     private ArrayList<Question> questions = new ArrayList<>();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_question_create_screen);
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
         database = FirebaseDatabase.getInstance();
         questionsRef = database.getReference("questions");
         dbContext = DbContext.getInstance();
-
-        initializeViews();
-        setupInitialState();
-        setupClickListeners();
-
-        MenuNavigationClickController controller = new MenuNavigationClickController(this);
-        controller.setUpAndHandleBottomNavigationView(findViewById(R.id.bottomNavigation));
     }
 
-    private void initializeViews() {
+    @SuppressLint("MissingInflatedId")
+    @Nullable
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Inflate layout for the question creation screen
+        View view = inflater.inflate(R.layout.fragment_question_create, container, false);
+
+        // Initialize view components
+        initializeViews(view);
+
+        // Setup the initial state of the fragment
+        setupInitialState();
+
+        // Setup click listeners for interactive components
+        setupClickListeners();
+
+        // Set up the BottomNavigationView with MenuNavigationClickController
+        if (getActivity() != null) {
+            MenuNavigationClickController controller = new MenuNavigationClickController(
+                    requireContext(),
+                    getParentFragmentManager()
+            );
+
+            // Find student and teacher navigation views in the layout
+            View studentNav = view.findViewById(R.id.studentBottomNavigation);
+            View teacherNav = view.findViewById(R.id.teacherBottomNavigation);
+
+            // Initialize the navigation with both student and teacher views if they exist
+            if (studentNav != null || teacherNav != null) {
+                controller.initializeNavigations(
+                        studentNav,  // Student navigation or default screen
+                        teacherNav   // Teacher navigation if available
+                );
+            }
+        }
+
+        return view;
+    }
+
+
+
+    private void initializeViews(View view) {
         // Initialize Question Pack Views
-        questionPackTitleInput = findViewById(R.id.questionPackTitleInput);
-        questionPackDescriptionInput = findViewById(R.id.questionPackDescriptionInput);
-        questionPackTopicInput = findViewById(R.id.questionPackTopicInput);
-        createPackButton = findViewById(R.id.createPackButton);
+        questionPackTitleInput = view.findViewById(R.id.questionPackTitleInput);
+        questionPackDescriptionInput = view.findViewById(R.id.questionPackDescriptionInput);
+        questionPackTopicInput = view.findViewById(R.id.questionPackTopicInput);
+        createPackButton = view.findViewById(R.id.createPackButton);
 
         // Initialize Question Views
-        questionInput = findViewById(R.id.questionInput);
-        optionAInput = findViewById(R.id.optionAInput);
-        optionBInput = findViewById(R.id.optionBInput);
-        optionCInput = findViewById(R.id.optionCInput);
-        optionDInput = findViewById(R.id.optionDInput);
-        correctAnswerGroup = findViewById(R.id.correctAnswerGroup);
+        questionInput = view.findViewById(R.id.questionInput);
+        optionAInput = view.findViewById(R.id.optionAInput);
+        optionBInput = view.findViewById(R.id.optionBInput);
+        optionCInput = view.findViewById(R.id.optionCInput);
+        optionDInput = view.findViewById(R.id.optionDInput);
+        correctAnswerGroup = view.findViewById(R.id.correctAnswerGroup);
+        //saveButton = view.findViewById(R.id.saveButton);
 
-        addQuestionButton = findViewById(R.id.AddQuestionButton);
-        deleteQuestionButton = findViewById(R.id.deleteQuestionButton);
-        questionNumber = findViewById(R.id.questionNumber);
+        addQuestionButton = view.findViewById(R.id.AddQuestionButton);
+        deleteQuestionButton = view.findViewById(R.id.deleteQuestionButton);
+        questionNumber = view.findViewById(R.id.questionNumber);
     }
 
     private void setupInitialState() {
@@ -105,6 +134,7 @@ public class QuestionCreateScreen extends AppCompatActivity {
         createPackButton.setOnClickListener(v -> createQuestionPack());
         addQuestionButton.setOnClickListener(v -> addNewQuestion());
         deleteQuestionButton.setOnClickListener(v -> deleteQuestion());
+
     }
 
     private void createQuestionPack() {
@@ -113,13 +143,15 @@ public class QuestionCreateScreen extends AppCompatActivity {
         String topic = questionPackTopicInput.getText().toString().trim();
 
         if (title.isEmpty() || description.isEmpty() || topic.isEmpty()) {
-            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin gói câu hỏi", Toast.LENGTH_SHORT).show();
+            showToast("Vui lòng điền đầy đủ thông tin gói câu hỏi");
             return;
         }
 
-        String teacherId = SessionManager.getInstance(this).getUserSession().getUser().getUsername();
+        if (getContext() == null) return;
+
+        String teacherId = SessionManager.getInstance(getContext()).getUserSession().getUser().getUsername();
         if (teacherId == null) {
-            Toast.makeText(this, "Vui lòng đăng nhập để tạo gói câu hỏi", Toast.LENGTH_SHORT).show();
+            showToast("Vui lòng đăng nhập để tạo gói câu hỏi");
             return;
         }
 
@@ -135,7 +167,7 @@ public class QuestionCreateScreen extends AppCompatActivity {
         // Disable pack inputs and enable question inputs
         setPackInputsEnabled(false);
         setQuestionInputsEnabled(true);
-        Toast.makeText(this, "Đã tạo gói câu hỏi. Hãy thêm câu hỏi vào gói.", Toast.LENGTH_LONG).show();
+        showToast("Đã tạo gói câu hỏi. Hãy thêm câu hỏi vào gói.");
     }
 
     private void saveQuestion() {
@@ -181,9 +213,9 @@ public class QuestionCreateScreen extends AppCompatActivity {
     private void saveQuestionPackToDatabase() {
         dbContext.addWithAutoId("questionPacks", currentQuestionPack)
                 .addOnSuccessListener(aVoid ->
-                        Toast.makeText(this, "Đã lưu câu hỏi vào gói", Toast.LENGTH_SHORT).show())
+                        showToast("Đã lưu câu hỏi vào gói"))
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "Lỗi khi lưu: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        showToast("Lỗi khi lưu: " + e.getMessage()));
     }
 
     private void deleteQuestion() {
@@ -192,7 +224,9 @@ public class QuestionCreateScreen extends AppCompatActivity {
             return;
         }
 
-        new AlertDialog.Builder(this)
+        if (getContext() == null) return;
+
+        new AlertDialog.Builder(getContext())
                 .setTitle("Xác nhận xóa")
                 .setMessage("Bạn có chắc muốn xóa câu hỏi này?")
                 .setPositiveButton("Xóa", (dialog, which) -> {
@@ -228,7 +262,7 @@ public class QuestionCreateScreen extends AppCompatActivity {
 
     private boolean validateInputs() {
         if (currentQuestionPack == null) {
-            Toast.makeText(this, "Vui lòng tạo gói câu hỏi trước", Toast.LENGTH_SHORT).show();
+            showToast("Vui lòng tạo gói câu hỏi trước");
             return false;
         }
 
@@ -241,12 +275,12 @@ public class QuestionCreateScreen extends AppCompatActivity {
                 optionBInput.getText().toString().trim().isEmpty() ||
                 optionCInput.getText().toString().trim().isEmpty() ||
                 optionDInput.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Vui lòng điền đầy đủ các lựa chọn", Toast.LENGTH_SHORT).show();
+            showToast("Vui lòng điền đầy đủ các lựa chọn");
             return false;
         }
 
         if (correctAnswerGroup.getCheckedRadioButtonId() == -1) {
-            Toast.makeText(this, "Vui lòng chọn đáp án đúng", Toast.LENGTH_SHORT).show();
+            showToast("Vui lòng chọn đáp án đúng");
             return false;
         }
 
@@ -295,6 +329,7 @@ public class QuestionCreateScreen extends AppCompatActivity {
         optionDInput.setEnabled(enabled);
         correctAnswerGroup.setEnabled(enabled);
 
+
         addQuestionButton.setEnabled(enabled);
         deleteQuestionButton.setEnabled(enabled);
     }
@@ -304,5 +339,17 @@ public class QuestionCreateScreen extends AppCompatActivity {
         questionPackDescriptionInput.setEnabled(enabled);
         questionPackTopicInput.setEnabled(enabled);
         createPackButton.setEnabled(enabled);
+    }
+
+    private void showToast(String message) {
+        if (getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Clean up any resources if needed
     }
 }
