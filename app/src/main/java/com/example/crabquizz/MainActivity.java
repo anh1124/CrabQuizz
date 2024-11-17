@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             initViews();
 
             GetAppSetUp();
-            CleanUserSession();
+            //CleanUserSession();
             CheckAutoAndLoginIfAble();
 
         } catch (Exception e) {
@@ -54,14 +54,25 @@ public class MainActivity extends AppCompatActivity {
 
     private void CheckAutoAndLoginIfAble() {
         try {
-            if (sessionManager != null && sessionManager.isAutoLoginEnabled()) {
-                TryloginWithUsernameAndTokenSharedPreferences();
-            } else {
-                createGuestUserSession();
+            if (sessionManager != null) {
+                // Kiểm tra xem đã có user session chưa
+                if (sessionManager.getUserSession() != null &&
+                        sessionManager.getUserSession().getUser() != null) {
+                    // Nếu đã có session, chuyển thẳng đến home
+                    navigateToHomeFragment();
+                }
+                // Nếu chưa có session nhưng có auto login
+                else if (sessionManager.isAutoLoginEnabled()) {
+                    TryloginWithUsernameAndTokenSharedPreferences();
+                }
+                // Nếu không có gì thì tạo guest
+                else {
+                    createGuestUserSession();
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in auto login check: ", e);
-            createGuestUserSession(); // Fallback to guest mode
+            createGuestUserSession();
         }
     }
 

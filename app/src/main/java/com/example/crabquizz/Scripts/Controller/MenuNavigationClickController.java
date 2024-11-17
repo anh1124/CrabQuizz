@@ -8,31 +8,48 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.crabquizz.ClassFragment;
 import com.example.crabquizz.HomeFragment;
 import com.example.crabquizz.ProfileFragment;
 import com.example.crabquizz.QuestionCreateFragment;
 import com.example.crabquizz.QuestionFragment;
-import com.example.crabquizz.R;
 import com.example.crabquizz.SearchFragment;
+import com.example.crabquizz.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * Controller quản lý điều hướng menu bottom navigation
+ * Xử lý chuyển đổi màn hình và hiển thị menu dựa trên vai trò người dùng (giáo viên/học sinh)
+ */
 public class MenuNavigationClickController {
+    // Constants for logging and preferences
     private static final String TAG = "MenuNavController";
-    private final Context context;
-    private final FragmentManager fragmentManager;
     private static final String PREF_NAME = "NavigationState";
     private static final String CURRENT_SCREEN_KEY = "CurrentScreen";
 
+    // Core dependencies
+    private final Context context;
+    private final FragmentManager fragmentManager;
+    private final SessionManager sessionManager;
+
+    // Navigation views for different user roles
     private BottomNavigationView studentNavigation;
     private BottomNavigationView teacherNavigation;
-    private SessionManager sessionManager;
 
+    /**
+     * Khởi tạo controller với context và fragment manager
+     */
     public MenuNavigationClickController(Context context, FragmentManager fragmentManager) {
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.sessionManager = SessionManager.getInstance(context);
     }
 
+    /**
+     * Khởi tạo và thiết lập navigation views cho cả học sinh và giáo viên
+     * @param studentNav View navigation của học sinh
+     * @param teacherNav View navigation của giáo viên
+     */
     public void initializeNavigations(View studentNav, View teacherNav) {
         if (!(studentNav instanceof BottomNavigationView) || !(teacherNav instanceof BottomNavigationView)) {
             Log.e(TAG, "Invalid navigation views provided");
@@ -42,106 +59,100 @@ public class MenuNavigationClickController {
         studentNavigation = (BottomNavigationView) studentNav;
         teacherNavigation = (BottomNavigationView) teacherNav;
 
-        // Update navigation visibility based on user role
         setUpNavigationBasedOnUserRole();
-
-        // Set up navigation listeners for both student and teacher roles
         setupStudentNavigation();
         setupTeacherNavigation();
-
-        // Restore last selected screen
         restoreLastScreen();
     }
 
-    // Method to determine and show navigation based on the user's role
+    /**
+     * Thiết lập hiển thị navigation dựa trên vai trò người dùng
+     */
     private void setUpNavigationBasedOnUserRole() {
         String userRole = sessionManager.getUserSession().getUser().getRole();
-        // If the user is a teacher, show teacher navigation, otherwise show student navigation
-        if ("teacher".equals(userRole)) {
-            teacherNavigation.setVisibility(View.VISIBLE);
-            studentNavigation.setVisibility(View.GONE);
-        } else {
-            studentNavigation.setVisibility(View.VISIBLE);
-            teacherNavigation.setVisibility(View.GONE);
-        }
+        boolean isTeacher = "teacher".equals(userRole);
+
+        teacherNavigation.setVisibility(isTeacher ? View.VISIBLE : View.GONE);
+        studentNavigation.setVisibility(isTeacher ? View.GONE : View.VISIBLE);
     }
 
+    /**
+     * Thiết lập listener cho navigation của học sinh
+     */
     private void setupStudentNavigation() {
         studentNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            Fragment fragment = getFragmentForStudentNavigation(itemId);
-
-            if (fragment != null) {
-                loadFragment(fragment);
-                saveCurrentScreen(itemId);
-                return true;
-            }
-            return false;
+            Fragment fragment = getFragmentForStudentNavigation(item.getItemId());
+            return handleNavigation(fragment, item.getItemId());
         });
     }
 
+    /**
+     * Thiết lập listener cho navigation của giáo viên
+     */
     private void setupTeacherNavigation() {
         teacherNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            Fragment fragment = getFragmentForTeacherNavigation(itemId);
-
-            if (fragment != null) {
-                loadFragment(fragment);
-                saveCurrentScreen(itemId);
-                return true;
-            }
-            return false;
+            Fragment fragment = getFragmentForTeacherNavigation(item.getItemId());
+            return handleNavigation(fragment, item.getItemId());
         });
     }
 
-    // Method to get corresponding fragment for student navigation
+    /**
+     * Lấy fragment tương ứng với item được chọn trong menu học sinh
+     */
     private Fragment getFragmentForStudentNavigation(int itemId) {
         switch (itemId) {
-            case R.id.home:
-                return new HomeFragment();
-            case R.id.search:
-                return new SearchFragment();
-            case R.id.question:
-                return new QuestionFragment();
-            case R.id.profile:
-                return new ProfileFragment();
-            default:
-                return null;
+            case R.id.home: return new HomeFragment();
+            case R.id.search: return new SearchFragment();
+            case R.id.question: return new QuestionFragment();
+            case R.id.profile: return new ProfileFragment();
+            default: return null;
         }
     }
 
-    // Method to get corresponding fragment for teacher navigation
+    /**
+     * Lấy fragment tương ứng với item được chọn trong menu giáo viên
+     */
     private Fragment getFragmentForTeacherNavigation(int itemId) {
         switch (itemId) {
-            case R.id.home:
-                return new HomeFragment();
-            case R.id.myclass:
-                return new QuestionFragment();
-            case R.id.question:
-                return new QuestionCreateFragment();
-            case R.id.profile:
-                return new ProfileFragment();
-            default:
-                return null;
+            case R.id.home: return new HomeFragment();
+            case R.id.myclass: return new ClassFragment();
+            case R.id.question: return new QuestionFragment();
+            case R.id.profile: return new ProfileFragment();
+            default: return null;
         }
     }
 
+    /**
+     * Xử lý chung cho việc chuyển đổi fragment
+     */
+    private boolean handleNavigation(Fragment fragment, int itemId) {
+        if (fragment != null) {
+            loadFragment(fragment);
+            saveCurrentScreen(itemId);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Khôi phục màn hình cuối cùng được chọn (mặc định là Home)
+     */
     private void restoreLastScreen() {
-        // Không cần kiểm tra SharedPreferences vì ta luôn muốn quay về HomeFragment.
-        int lastScreenId = R.id.home;
+        int homeScreenId = R.id.home;
+        String userRole = sessionManager.getUserSession().getUser().getRole();
 
-        if ("teacher".equals(sessionManager.getUserSession().getUser().getRole())) {
-            teacherNavigation.setSelectedItemId(lastScreenId);
+        if ("teacher".equals(userRole)) {
+            teacherNavigation.setSelectedItemId(homeScreenId);
         } else {
-            studentNavigation.setSelectedItemId(lastScreenId);
+            studentNavigation.setSelectedItemId(homeScreenId);
         }
 
-        // Tải fragment mặc định là HomeFragment
-        Fragment homeFragment = new HomeFragment();
-        loadFragment(homeFragment);
+        loadFragment(new HomeFragment());
     }
 
-
+    /**
+     * Load fragment với animation chuyển cảnh
+     */
     private void loadFragment(Fragment fragment) {
         try {
             FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -158,6 +169,9 @@ public class MenuNavigationClickController {
         }
     }
 
+    /**
+     * Lưu trạng thái màn hình hiện tại
+     */
     private void saveCurrentScreen(int screenId) {
         try {
             SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);

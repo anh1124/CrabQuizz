@@ -3,30 +3,29 @@ package com.example.crabquizz.Scripts.Controller;
 import android.content.Context;
 import android.view.View;
 import androidx.fragment.app.FragmentManager;
-
-import com.example.crabquizz.HomeFragment;
 import com.example.crabquizz.R;
-import com.example.crabquizz.Scripts.Controller.MenuNavigationClickController;
 
+/**
+ * Lớp quản lý việc chuyển đổi giữa các fragment và khởi tạo thanh điều hướng
+ */
 public class TransitionFragemt {
-    // Phương thức này sẽ khởi tạo và quản lý việc chuyển đổi giữa các fragments
+    /**
+     * Khởi tạo thanh điều hướng và thiết lập các sự kiện chuyển fragment
+     * @param context Context của ứng dụng
+     * @param fragmentManager Quản lý các fragment
+     * @param rootView View gốc chứa thanh điều hướng
+     */
     public static void initializeMenuNavigation(Context context, FragmentManager fragmentManager, View rootView) {
-        // Khởi tạo controller MenuNavigationClickController
-        MenuNavigationClickController controller = new MenuNavigationClickController(
-                context,
-                fragmentManager
-        );
+        // Tạo controller xử lý sự kiện điều hướng
+        MenuNavigationClickController controller = new MenuNavigationClickController(context, fragmentManager);
 
-        // Lấy các view của thanh điều hướng
+        // Lấy view của hai thanh điều hướng từ layout
         View studentNav = rootView.findViewById(R.id.studentBottomNavigation);
         View teacherNav = rootView.findViewById(R.id.teacherBottomNavigation);
 
-        // Kiểm tra và khởi tạo navigation nếu các view không null
+        // Khởi tạo điều hướng nếu các view tồn tại
         if (studentNav != null && teacherNav != null) {
             controller.initializeNavigations(studentNav, teacherNav);
         }
-
-
     }
 }
-

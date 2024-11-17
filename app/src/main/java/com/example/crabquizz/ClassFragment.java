@@ -2,11 +2,18 @@ package com.example.crabquizz;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.crabquizz.Scripts.Controller.MenuNavigationClickController;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,18 +54,37 @@ public class ClassFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_class, container, false);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_class, container, false);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Set up window insets for padding adjustment
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        // Set up MenuNavigationClickController
+        MenuNavigationClickController controller = new MenuNavigationClickController(
+                requireContext(),
+                getParentFragmentManager() // or getChildFragmentManager() based on your use case
+        );
+
+        // Find both student and teacher navigation views in the layout
+        View studentNav = view.findViewById(R.id.studentBottomNavigation);
+        View teacherNav = view.findViewById(R.id.teacherBottomNavigation);
+
+        // Initialize navigation if the views are available
+        if (studentNav != null || teacherNav != null) {
+            controller.initializeNavigations(
+                    studentNav,  // For student or default screen
+                    teacherNav   // For teacher if available
+            );
+        }
     }
 }
