@@ -127,15 +127,20 @@ public class MenuNavigationClickController {
     }
 
     private void restoreLastScreen() {
-        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        int lastScreenId = prefs.getInt(CURRENT_SCREEN_KEY, R.id.home);
+        // Không cần kiểm tra SharedPreferences vì ta luôn muốn quay về HomeFragment.
+        int lastScreenId = R.id.home;
 
         if ("teacher".equals(sessionManager.getUserSession().getUser().getRole())) {
             teacherNavigation.setSelectedItemId(lastScreenId);
         } else {
             studentNavigation.setSelectedItemId(lastScreenId);
         }
+
+        // Tải fragment mặc định là HomeFragment
+        Fragment homeFragment = new HomeFragment();
+        loadFragment(homeFragment);
     }
+
 
     private void loadFragment(Fragment fragment) {
         try {

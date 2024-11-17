@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.crabquizz.Scripts.Controller.MenuNavigationClickController;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
+import com.example.crabquizz.Scripts.Controller.TransitionFragemt;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.Question;
 import com.example.crabquizz.Scripts.Models.QuestionPack;
@@ -78,25 +79,7 @@ public class QuestionCreateFragment extends Fragment {
         // Setup click listeners for interactive components
         setupClickListeners();
 
-        // Set up the BottomNavigationView with MenuNavigationClickController
-        if (getActivity() != null) {
-            MenuNavigationClickController controller = new MenuNavigationClickController(
-                    requireContext(),
-                    getParentFragmentManager()
-            );
-
-            // Find student and teacher navigation views in the layout
-            View studentNav = view.findViewById(R.id.studentBottomNavigation);
-            View teacherNav = view.findViewById(R.id.teacherBottomNavigation);
-
-            // Initialize the navigation with both student and teacher views if they exist
-            if (studentNav != null || teacherNav != null) {
-                controller.initializeNavigations(
-                        studentNav,  // Student navigation or default screen
-                        teacherNav   // Teacher navigation if available
-                );
-            }
-        }
+        TransitionFragemt.initializeMenuNavigation(requireContext(), getParentFragmentManager(), view);
 
         return view;
     }

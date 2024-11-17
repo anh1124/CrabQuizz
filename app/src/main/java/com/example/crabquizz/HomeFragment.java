@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.crabquizz.Scripts.Controller.MenuNavigationClickController;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
+import com.example.crabquizz.Scripts.Controller.TransitionFragemt;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,18 +41,7 @@ public class HomeFragment extends Fragment {
             setupImage();
             setupQuizControls();
 
-            // Initialize controller and pass context
-            MenuNavigationClickController controller = new MenuNavigationClickController(
-                    requireContext(),
-                    getParentFragmentManager()
-            );
-
-            View studentNav = rootView.findViewById(R.id.studentBottomNavigation);
-            View teacherNav = rootView.findViewById(R.id.teacherBottomNavigation);
-
-            if (studentNav != null && teacherNav != null) {
-                controller.initializeNavigations(studentNav, teacherNav);
-            }
+            TransitionFragemt.initializeMenuNavigation(requireContext(), getParentFragmentManager(), rootView);
 
             return rootView;
         } catch (Exception e) {

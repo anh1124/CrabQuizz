@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.crabquizz.Scripts.Controller.MenuNavigationClickController;
+import com.example.crabquizz.Scripts.Controller.TransitionFragemt;
 import com.example.crabquizz.Scripts.Controller.UserController;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
 
@@ -24,19 +25,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        if (getActivity() != null) {
-            // Initialize the MenuNavigationClickController and pass the context and fragment manager
-            MenuNavigationClickController controller = new MenuNavigationClickController(requireContext(), getParentFragmentManager());
-
-            // Assuming the profile fragment uses both student and teacher navigation views
-            View studentNav = view.findViewById(R.id.studentBottomNavigation);
-            View teacherNav = view.findViewById(R.id.teacherBottomNavigation);
-
-            // Initialize navigation if the views are present
-            if (studentNav != null && teacherNav != null) {
-                controller.initializeNavigations(studentNav, teacherNav);
-            }
-        }
+        TransitionFragemt.initializeMenuNavigation(requireContext(), getParentFragmentManager(), view);
 
         initViews(view);
         showLogoutBtn();

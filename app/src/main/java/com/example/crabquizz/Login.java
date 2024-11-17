@@ -3,6 +3,7 @@ package com.example.crabquizz;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -14,6 +15,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.crabquizz.Scripts.Controller.TransitionFragemt;
 import com.example.crabquizz.Scripts.Controller.UserController;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.User;
@@ -72,8 +74,7 @@ public class Login extends AppCompatActivity {
     }
 
     private void GoHomeActive() {
-        Intent intent = new Intent(Login.this, HomeFragment.class);
-        startActivity(intent);
+        TransitionFragemt.initializeMenuNavigation(this, getSupportFragmentManager(), findViewById(R.id.fragment_home));
     }
 
     private void DoLoginAction()
