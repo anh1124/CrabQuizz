@@ -1,6 +1,6 @@
 package com.example.crabquizz.Scripts.Models;
 
-class Question {
+public class Question {
     private int id;//id in
     private String question;
     private String answer1;
@@ -9,6 +9,8 @@ class Question {
     private String answer4;
     private int correctAnswer; // 1-A, 2-B, 3-C, 4-D
 
+    public Question() {
+    }
     // Constructor đầy đủ tham số
     public Question(int id, String question, String answer1, String answer2,
                     String answer3, String answer4, int correctAnswer) {
@@ -21,22 +23,14 @@ class Question {
         this.correctAnswer = correctAnswer;
     }
 
-    // Constructor với 2 câu trả lời
+    // Constructor với 2 câu trả lời (đặt answer3 và answer4 là chuỗi rỗng)
     public Question(int id, String question, String answer1, String answer2, int correctAnswer) {
-        this.id = id;
-        this.question = question;
-        this.answer1 = answer1;
-        this.answer2 = answer2;
-        this.correctAnswer = correctAnswer;
+        this(id, question, answer1, answer2, "", "", correctAnswer);
     }
-    // Constructor với 3 câu trả lời
-    public Question(int id, String question, String answer1, String answer2,String answer3, int correctAnswer) {
-        this.id = id;
-        this.question = question;
-        this.answer1 = answer1;
-        this.answer2 = answer2;
-        this.answer3 = answer3;
-        this.correctAnswer = correctAnswer;
+
+    // Constructor với 3 câu trả lời (đặt answer4 là chuỗi rỗng)
+    public Question(int id, String question, String answer1, String answer2, String answer3, int correctAnswer) {
+        this(id, question, answer1, answer2, answer3, "", correctAnswer);
     }
     // Getters and Setters
     public int getId() {

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="#F0F0F0"
     tools:context=".QuestionCreateScreen">
 
     <TextView
@@ -14,19 +14,22 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Tạo câu hỏi mới"
+        android:text="Tạo bộ câu hỏi mới"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:clipToPadding="false"
         android:fillViewport="true"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
         android:paddingHorizontal="16dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
         app:layout_constraintTop_toBottomOf="@id/titleText">
@@ -34,27 +37,103 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="false"
+            android:focusable="false">
 
+            <!-- Question Pack Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="1dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    android:background="#FFF3F8">
+                    android:padding="24dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:background="@android:color/white">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Thông tin bộ câu hỏi"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/questionPackTitleInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Tên bộ câu hỏi" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/questionPackDescriptionInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Mô tả"
+                            android:inputType="textMultiLine"
+                            android:minLines="3" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/questionPackTopicInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Chủ đề" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Question Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:background="@android:color/white">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:clickable="false"
+                        android:focusable="false">
 
                         <TextView
                             android:id="@+id/questionNumber"
@@ -63,81 +142,92 @@
                             android:layout_weight="1"
                             android:text="Câu hỏi 1"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
 
                         <ImageButton
                             android:id="@+id/AddQuestionButton"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:src="@drawable/ic_add"
-                            app:tint="#000000" />
+                            app:tint="#1a73e8" />
 
                         <ImageButton
                             android:id="@+id/deleteQuestionButton"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:src="@drawable/ic_delete"
-                            app:tint="#FF0000" />
-
+                            app:tint="#d93025" />
                     </LinearLayout>
 
-                    <EditText
-                        android:id="@+id/questionInput"
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:background="@android:color/white"
-                        android:hint="Nhập nội dung câu hỏi"
-                        android:inputType="textMultiLine"
-                        android:minHeight="48dp"
-                        android:padding="12dp"
-                        android:textSize="14sp" />
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                    <EditText
-                        android:id="@+id/optionAInput"
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/questionInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Nội dung câu hỏi"
+                            android:inputType="textMultiLine"
+                            android:minLines="2" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/optionAInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Đáp án A" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:background="@android:color/white"
-                        android:hint="Đáp án A"
-                        android:minHeight="48dp"
-                        android:padding="12dp"
-                        android:textSize="14sp" />
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                    <EditText
-                        android:id="@+id/optionBInput"
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/optionBInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Đáp án B" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:background="@android:color/white"
-                        android:hint="Đáp án B"
-                        android:minHeight="48dp"
-                        android:padding="12dp"
-                        android:textSize="14sp" />
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                    <EditText
-                        android:id="@+id/optionCInput"
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/optionCInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Đáp án C" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:background="@android:color/white"
-                        android:hint="Đáp án C"
-                        android:minHeight="48dp"
-                        android:padding="12dp"
-                        android:textSize="14sp" />
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                    <EditText
-                        android:id="@+id/optionDInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:background="@android:color/white"
-                        android:hint="Đáp án D"
-                        android:minHeight="48dp"
-                        android:padding="12dp"
-                        android:textSize="14sp" />
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/optionDInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Đáp án D" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -145,7 +235,8 @@
                         android:layout_marginTop="16dp"
                         android:text="Đáp án đúng"
                         android:textColor="@color/black"
-                        android:textSize="14sp" />
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <RadioGroup
                         android:id="@+id/correctAnswerGroup"
@@ -181,32 +272,34 @@
                             android:layout_height="wrap_content"
                             android:text="D" />
                     </RadioGroup>
-
-                    <Button
-                        android:id="@+id/saveButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="16dp"
-                        android:background="@color/blue"
-                        android:paddingHorizontal="24dp"
-                        android:text="Lưu câu hỏi"
-                        android:textAllCaps="false"
-                        android:textColor="@android:color/white" />
-
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Create Pack Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/createPackButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:padding="12dp"
+                android:text="Tạo bộ câu hỏi"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                app:cornerRadius="8dp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2000dp" />
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@color/white"
+        android:elevation="8dp"
         app:itemIconTint="@color/selector_bottom_nav"
+        app:itemRippleColor="@color/ripple_effect_color"
         app:itemTextColor="@color/selector_bottom_nav"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"

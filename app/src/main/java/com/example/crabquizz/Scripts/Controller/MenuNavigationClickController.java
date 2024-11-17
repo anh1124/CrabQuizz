@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.example.crabquizz.HomeScreen;
 import com.example.crabquizz.ProfileScreen;
+import com.example.crabquizz.QuestionCreateScreen;
 import com.example.crabquizz.QuestionScreen;
 import com.example.crabquizz.R;
 import com.example.crabquizz.SearchScreen;
@@ -36,7 +37,10 @@ public class MenuNavigationClickController {
         } else if (context instanceof QuestionScreen) {
             bottomNavigationView.setSelectedItemId(R.id.question);
             saveCurrentScreen(R.id.question);
-        } else if (context instanceof ProfileScreen) {
+        } else if (context instanceof QuestionCreateScreen) {
+            bottomNavigationView.setSelectedItemId(R.id.question);
+            saveCurrentScreen(R.id.question);
+        }else if (context instanceof ProfileScreen) {
             bottomNavigationView.setSelectedItemId(R.id.profile);
             saveCurrentScreen(R.id.profile);
         }
