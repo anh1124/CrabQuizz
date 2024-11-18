@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,11 +14,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.example.crabquizz.Scripts.Controller.TransitionFragemt;
+import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.Question;
 import com.example.crabquizz.Scripts.Models.QuestionPack;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 
 public class QuestionCreateFragment extends Fragment {
@@ -34,24 +39,34 @@ public class QuestionCreateFragment extends Fragment {
     private ImageButton deleteQuestionButton;
     private TextView questionNumber;
     private Button finishButton;
+    private DbContext dbContext;
 
-    private QuestionPack currentQuestionPack;
+    // QuestionPack details
+    private String packId;
+    private String teacherId;
+    private String title;
+    private String description;
+    private String topic;
+
+    // Questions management
     private int currentQuestionIndex = 1;
     private ArrayList<Question> questions = new ArrayList<>();
+    private static final String QUESTION_PACKS_COLLECTION = "questionpacks";
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         database = FirebaseDatabase.getInstance();
-        questionsRef = database.getReference("questions");
+        dbContext = DbContext.getInstance();
 
+        // Extract QuestionPack details from arguments
         if (getArguments() != null) {
-            currentQuestionPack = getArguments().getParcelable("question_pack");
-            if (currentQuestionPack != null) {
-                questions = new ArrayList<>(currentQuestionPack.getQuestions() != null ?
-                        currentQuestionPack.getQuestions() : new ArrayList<>());
-                currentQuestionIndex = questions.size() + 1;
-            }
+            packId = getArguments().getString("packId");
+            teacherId = getArguments().getString("teacherId");
+            title = getArguments().getString("title");
+            description = getArguments().getString("description");
+            topic = getArguments().getString("topic");
         }
     }
 
@@ -66,6 +81,7 @@ public class QuestionCreateFragment extends Fragment {
     }
 
     private void initializeViews(View view) {
+        // Find and initialize all view components
         questionInput = view.findViewById(R.id.questionInput);
         optionAInput = view.findViewById(R.id.optionAInput);
         optionBInput = view.findViewById(R.id.optionBInput);
@@ -77,12 +93,12 @@ public class QuestionCreateFragment extends Fragment {
         questionNumber = view.findViewById(R.id.questionNumber);
         finishButton = view.findViewById(R.id.finishButton);
 
+        // Update UI
         updateQuestionNumber();
-        loadCurrentQuestion();
     }
 
     private void setupClickListeners() {
-        addQuestionButton.setOnClickListener(v -> addNewQuestion());
+        addQuestionButton.setOnClickListener(v -> addNewQuestionForm());
         deleteQuestionButton.setOnClickListener(v -> deleteQuestion());
         finishButton.setOnClickListener(v -> finishQuestionPack());
     }
@@ -99,69 +115,64 @@ public class QuestionCreateFragment extends Fragment {
         }
     }
 
-    private void addNewQuestion() {
-        if (!validateInputs()) {
-            showToast("Vui lòng điền đầy đủ thông tin câu hỏi");
-            return;
-        }
+    private void addNewQuestionForm() {
 
-        Question question = createQuestionFromInputs();
-
-        if (currentQuestionIndex <= questions.size()) {
-            // Cập nhật câu hỏi hiện tại
-            questions.set(currentQuestionIndex - 1, question);
-        } else {
-            // Thêm câu hỏi mới
-            questions.add(question);
-        }
-
-        // Cập nhật QuestionPack và lưu lên Firebase
-        updateQuestionPackAndSave(() -> {
-            showToast("Đã lưu câu hỏi thành công");
-            clearForm();
-            currentQuestionIndex++;
-            updateQuestionNumber();
-        });
     }
 
     private void deleteQuestion() {
-        if (currentQuestionIndex > 1 && !questions.isEmpty()) {
-            questions.remove(questions.size() - 1);
-            updateQuestionPackAndSave(() -> {
-                showToast("Đã xóa câu hỏi thành công");
-                currentQuestionIndex--;
-                updateQuestionNumber();
-                loadCurrentQuestion();
-            });
-        }
+        clearForm();
     }
 
-    private void updateQuestionPackAndSave(Runnable onSuccess) {
-        if (currentQuestionPack != null) {
-            currentQuestionPack.setQuestions(questions);
-            questionsRef.child(String.valueOf(currentQuestionPack.getId()))
-                    .setValue(currentQuestionPack)
-                    .addOnSuccessListener(aVoid -> {
-                        if (onSuccess != null) {
-                            onSuccess.run();
-                        }
-                    })
-                    .addOnFailureListener(e ->
-                            showToast("Lỗi khi lưu dữ liệu: " + e.getMessage())
-                    );
-        }
+    private void saveQuestionPack(Runnable onSuccess) {
+        // Convert questions to JSON
+        String questionJson = convertQuestionsToJson();
+
+        // Tạo QuestionPack
+        QuestionPack questionPack = new QuestionPack(
+                packId,
+                teacherId,
+                title,
+                description,
+                topic,
+                questionJson
+        );
+
+        // Lưu QuestionPack vào Firestore qua DbContext
+        DbContext dbContext = DbContext.getInstance();
+        dbContext.add(QUESTION_PACKS_COLLECTION, questionPack)
+                .addOnSuccessListener(aVoid -> {
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Lỗi khi lưu dữ liệu: " + e.getMessage());
+                });
+    }
+
+
+    private String convertQuestionsToJson() {
+        // Convert questions list to JSON string
+        // You'll need to add a JSON library like Gson to your project
+        Gson gson = new Gson();
+        return gson.toJson(questions);
     }
 
     private void finishQuestionPack() {
+        // Validate that the current form is complete before adding to list
+        if (validateInputs()) {
+            Question currentQuestion = createQuestionFromInputs();
+            questions.add(currentQuestion);
+        }
+
         if (questions.isEmpty()) {
             showToast("Vui lòng thêm ít nhất một câu hỏi");
             return;
         }
 
-        // Lưu lần cuối và chuyển về màn hình chính
-        updateQuestionPackAndSave(() -> {
+        // Save final version and return to main screen
+        saveQuestionPack(() -> {
             showToast("Đã hoàn thành bộ câu hỏi");
-            // Chuyển về màn hình chính hoặc danh sách bộ câu hỏi
             requireActivity().getSupportFragmentManager().popBackStack();
         });
     }

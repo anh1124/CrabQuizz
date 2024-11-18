@@ -13,11 +13,13 @@ import android.widget.Button;
 import android.widget.Toast;
 import com.example.crabquizz.Scripts.Controller.NavigationController;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
-import com.example.crabquizz.Scripts.Controller.TransitionFragemt;
+import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.QuestionPack;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class QuestionPackCreateFragment extends Fragment {
     private Button createPackButton;
@@ -25,15 +27,14 @@ public class QuestionPackCreateFragment extends Fragment {
     private TextInputEditText questionPackTitleInput;
     private TextInputEditText questionPackDescriptionInput;
     private TextInputEditText questionPackTopicInput;
-    private FirebaseDatabase database;
-    private DatabaseReference questionsRef;
+    private DbContext dbContext;
     private static final String TAG = "QuestionPackCreate";
+    private static final String QUESTION_PACKS_COLLECTION = "questionpacks";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        database = FirebaseDatabase.getInstance();
-        questionsRef = database.getReference("questionpacks");
+        dbContext = DbContext.getInstance();
     }
 
     @Nullable
@@ -58,7 +59,7 @@ public class QuestionPackCreateFragment extends Fragment {
     }
 
     private void createAndNavigate() {
-        // Lấy và kiểm tra dữ liệu đầu vào
+        // Validate input
         String title = questionPackTitleInput.getText().toString().trim();
         String description = questionPackDescriptionInput.getText().toString().trim();
         String topic = questionPackTopicInput.getText().toString().trim();
@@ -68,53 +69,50 @@ public class QuestionPackCreateFragment extends Fragment {
             return;
         }
 
-        // Kiểm tra người dùng đã đăng nhập
+        // Check user login
         String teacherId = SessionManager.getInstance(getContext()).getUserSession().getUser().getUsername();
         if (teacherId == null) {
             showToast("Vui lòng đăng nhập để tạo bộ câu hỏi");
             return;
         }
 
-        // Tạo ID cho bộ câu hỏi mới
-        String packId = questionsRef.push().getKey();
-        if (packId == null) {
-            showToast("Không thể tạo ID cho bộ câu hỏi. Vui lòng thử lại.");
-            return;
-        }
+        // Prepare question pack data
+        Map<String, Object> questionPackData = new HashMap<>();
+        questionPackData.put("teacherId", teacherId);
+        questionPackData.put("title", title);
+        questionPackData.put("description", description);
+        questionPackData.put("topic", topic);
 
-        // Log thông tin để debug
-        Log.d(TAG, "Generated packId: " + packId);
-        Log.d(TAG, "Teacher ID: " + teacherId);
-        Log.d(TAG, "Title: " + title);
-        Log.d(TAG, "Description: " + description);
-        Log.d(TAG, "Topic: " + topic);
+        // Save to Firestore using DbContext
+        dbContext.addWithAutoId(QUESTION_PACKS_COLLECTION, questionPackData)
+                .addOnSuccessListener(documentReference -> {
+                    showToast("Tạo bộ câu hỏi thành công!");
 
-        // Tạo đối tượng QuestionPack
-        QuestionPack questionPack = new QuestionPack(
-                packId,
-                teacherId,
-                title,
-                description,
-                topic
-        );
+                    // Create QuestionPack object with the new document ID
+                    QuestionPack questionPack = new QuestionPack(
+                            documentReference.getId(),
+                            teacherId,
+                            title,
+                            description,
+                            topic,
+                            null  // questionJson will be updated later
+                    );
 
-        // Lưu dữ liệu lên Firebase
-        questionsRef.child(packId).setValue(questionPack)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "Data saved successfully to Firebase");
-                        showToast("Tạo bộ câu hỏi thành công!");
-                        navigateToQuestionCreateFragment(questionPack);
-                    } else {
-                        Log.e(TAG, "Failed to save data", task.getException());
-                        showToast("Đã xảy ra lỗi khi tạo bộ câu hỏi. Vui lòng thử lại.");
-                    }
+                    navigateToQuestionCreateFragment(questionPack);
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Lỗi khi lưu: " + e.getMessage());
+                    Log.e(TAG, "Failed to save question pack", e);
                 });
     }
 
     private void navigateToQuestionCreateFragment(QuestionPack questionPack) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable("question_pack", questionPack);
+        bundle.putString("packId", questionPack.getId());
+        bundle.putString("teacherId", questionPack.getTeacherId());
+        bundle.putString("title", questionPack.getTitle());
+        bundle.putString("description", questionPack.getDescription());
+        bundle.putString("topic", questionPack.getTopic());
 
         QuestionCreateFragment createFragment = new QuestionCreateFragment();
         createFragment.setArguments(bundle);

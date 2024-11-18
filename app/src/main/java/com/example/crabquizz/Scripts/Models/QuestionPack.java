@@ -1,106 +1,23 @@
 package com.example.crabquizz.Scripts.Models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import java.util.ArrayList;
-import java.util.List;
-
-public class QuestionPack implements Parcelable {
+public class QuestionPack {
     private String id;
     private String teacherId;
     private String title;
     private String description;
     private String topic;
-    private String questionsJson;
-    private transient List<Question> questions;
+    private String questionJson;
 
     public QuestionPack() {
-        // Required for Firebase
     }
 
-    public QuestionPack(String id, String teacherId, String title, String description, String topic) {
+    public QuestionPack(String id, String teacherId, String title, String description, String topic, String questionJson) {
         this.id = id;
         this.teacherId = teacherId;
         this.title = title;
         this.description = description;
         this.topic = topic;
-        this.questions = new ArrayList<>();
-        //updateQuestionsJson();
-    }
-
-    // Constructor cho Parcelable
-    protected QuestionPack(Parcel in) {
-        id = in.readString();
-        teacherId = in.readString();
-        title = in.readString();
-        description = in.readString();
-        topic = in.readString();
-        //questionsJson = in.readString();
-        //loadQuestionsFromJson();
-    }
-
-    public static final Creator<QuestionPack> CREATOR = new Creator<QuestionPack>() {
-        @Override
-        public QuestionPack createFromParcel(Parcel in) {
-            return new QuestionPack(in);
-        }
-
-        @Override
-        public QuestionPack[] newArray(int size) {
-            return new QuestionPack[size];
-        }
-    };
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(teacherId);
-        dest.writeString(title);
-        dest.writeString(description);
-        dest.writeString(topic);
-        dest.writeString(questionsJson);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    // Thêm phương thức setQuestions()
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
-        updateQuestionsJson();
-    }
-
-    public void addQuestion(Question question) {
-        if (questions == null) {
-            questions = new ArrayList<>();
-        }
-        questions.add(question);
-        updateQuestionsJson();
-    }
-
-    public List<Question> getQuestions() {
-        if (questions == null && questionsJson != null) {
-            loadQuestionsFromJson();
-        }
-        return questions;
-    }
-
-    private void loadQuestionsFromJson() {
-        if (questionsJson != null && !questionsJson.isEmpty()) {
-            Gson gson = new Gson();
-            questions = gson.fromJson(questionsJson, new TypeToken<List<Question>>() {}.getType());
-        } else {
-            questions = new ArrayList<>();
-        }
-    }
-
-    private void updateQuestionsJson() {
-        Gson gson = new Gson();
-        this.questionsJson = gson.toJson(questions);
+        this.questionJson = questionJson;
     }
 
     // Getters and Setters
@@ -144,11 +61,11 @@ public class QuestionPack implements Parcelable {
         this.topic = topic;
     }
 
-    public String getQuestionsJson() {
-        return questionsJson;
+    public String getQuestionJson() {
+        return questionJson;
     }
 
-    public void setQuestionsJson(String questionsJson) {
-        this.questionsJson = questionsJson;
+    public void setQuestionJson(String questionJson) {
+        this.questionJson = questionJson;
     }
 }
