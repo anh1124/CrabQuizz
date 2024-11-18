@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/questionCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -57,7 +58,7 @@
                 android:minLines="2" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Đáp án A -->
+        <!-- Đáp án -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,7 +71,6 @@
                 android:hint="Đáp án A" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Đáp án B -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -83,7 +83,6 @@
                 android:hint="Đáp án B" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Đáp án C -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -96,7 +95,6 @@
                 android:hint="Đáp án C" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Đáp án D -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

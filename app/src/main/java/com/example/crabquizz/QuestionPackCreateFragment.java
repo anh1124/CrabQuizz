@@ -16,7 +16,6 @@ import com.example.crabquizz.Scripts.Controller.SessionManager;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.QuestionPack;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.firestore.DocumentReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +28,6 @@ public class QuestionPackCreateFragment extends Fragment {
     private TextInputEditText questionPackTopicInput;
     private DbContext dbContext;
     private static final String TAG = "QuestionPackCreate";
-    private static final String QUESTION_PACKS_COLLECTION = "questionpacks";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,34 +74,11 @@ public class QuestionPackCreateFragment extends Fragment {
             return;
         }
 
-        // Prepare question pack data
-        Map<String, Object> questionPackData = new HashMap<>();
-        questionPackData.put("teacherId", teacherId);
-        questionPackData.put("title", title);
-        questionPackData.put("description", description);
-        questionPackData.put("topic", topic);
+        // Create a QuestionPack object without saving to database
+        QuestionPack questionPack = new QuestionPack(null, teacherId, title, description, topic, null);
 
-        // Save to Firestore using DbContext
-        dbContext.addWithAutoId(QUESTION_PACKS_COLLECTION, questionPackData)
-                .addOnSuccessListener(documentReference -> {
-                    showToast("Tạo bộ câu hỏi thành công!");
-
-                    // Create QuestionPack object with the new document ID
-                    QuestionPack questionPack = new QuestionPack(
-                            documentReference.getId(),
-                            teacherId,
-                            title,
-                            description,
-                            topic,
-                            null  // questionJson will be updated later
-                    );
-
-                    navigateToQuestionCreateFragment(questionPack);
-                })
-                .addOnFailureListener(e -> {
-                    showToast("Lỗi khi lưu: " + e.getMessage());
-                    Log.e(TAG, "Failed to save question pack", e);
-                });
+        // Navigate to the next fragment with the created question pack
+        navigateToQuestionCreateFragment(questionPack);
     }
 
     private void navigateToQuestionCreateFragment(QuestionPack questionPack) {
