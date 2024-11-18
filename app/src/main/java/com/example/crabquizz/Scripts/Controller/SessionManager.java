@@ -83,7 +83,7 @@ public class SessionManager {
             user.setFullName("guess");
         }
 
-        public void newUserSession(){user = new User();}
+        //public void newUserSession(){user = new User();}
     }
     public void showLogUserData()
     {
@@ -96,7 +96,7 @@ public class SessionManager {
     {
         if (userTEMPSession != null) {
             userTEMPSession.clearSession();
-            userTEMPSession.newUserSession();
+            //userTEMPSession.newUserSession();
             Log.d("clearUserSessionInSessionManager", "has delete temp user session and make new 1");
         }
         else

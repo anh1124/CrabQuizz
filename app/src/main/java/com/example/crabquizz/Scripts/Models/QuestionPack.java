@@ -1,13 +1,14 @@
 package com.example.crabquizz.Scripts.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestionPack {
-    private long id;  // Đổi từ int sang long
+public class QuestionPack implements Parcelable {
+    private String id;
     private String teacherId;
     private String title;
     private String description;
@@ -15,30 +16,62 @@ public class QuestionPack {
     private String questionsJson;
     private transient List<Question> questions;
 
-    // Constructor
-    public QuestionPack(long id, String teacherId, String title, String description, String topic, String questionsJson) {
-        this.id = id;
-        this.teacherId = teacherId;
-        this.title = title;
-        this.description = description;
-        this.topic = topic;
-        this.questionsJson = questionsJson;
+    public QuestionPack() {
+        // Required for Firebase
     }
 
-    public QuestionPack(long id, String teacherId, String title, String description, String topic) {
+    public QuestionPack(String id, String teacherId, String title, String description, String topic) {
         this.id = id;
         this.teacherId = teacherId;
         this.title = title;
         this.description = description;
         this.topic = topic;
         this.questions = new ArrayList<>();
-        updateQuestionsJson();
+        //updateQuestionsJson();
+    }
+
+    // Constructor cho Parcelable
+    protected QuestionPack(Parcel in) {
+        id = in.readString();
+        teacherId = in.readString();
+        title = in.readString();
+        description = in.readString();
+        topic = in.readString();
+        //questionsJson = in.readString();
+        //loadQuestionsFromJson();
+    }
+
+    public static final Creator<QuestionPack> CREATOR = new Creator<QuestionPack>() {
+        @Override
+        public QuestionPack createFromParcel(Parcel in) {
+            return new QuestionPack(in);
+        }
+
+        @Override
+        public QuestionPack[] newArray(int size) {
+            return new QuestionPack[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(teacherId);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(topic);
+        dest.writeString(questionsJson);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     // Thêm phương thức setQuestions()
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
-        updateQuestionsJson(); // Cập nhật JSON khi set questions mới
+        updateQuestionsJson();
     }
 
     public void addQuestion(Question question) {
@@ -59,7 +92,7 @@ public class QuestionPack {
     private void loadQuestionsFromJson() {
         if (questionsJson != null && !questionsJson.isEmpty()) {
             Gson gson = new Gson();
-            questions = gson.fromJson(questionsJson, new TypeToken<List<Question>>(){}.getType());
+            questions = gson.fromJson(questionsJson, new TypeToken<List<Question>>() {}.getType());
         } else {
             questions = new ArrayList<>();
         }
@@ -71,11 +104,11 @@ public class QuestionPack {
     }
 
     // Getters and Setters
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

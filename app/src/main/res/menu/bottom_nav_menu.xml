@@ -11,12 +11,12 @@
         android:title="Tìm kiếm" />
 
     <item
-        android:id="@+id/question"
-        android:icon="@drawable/ic_question"
-        android:title="Câu hỏi" />
+        android:id="@+id/myclass"
+        android:icon="@drawable/ic_people"
+        android:title="Lớp học" />
 
     <item
         android:id="@+id/profile"
         android:icon="@drawable/ic_setting"
-        android:title="Tài Khoản" />
+        android:title="Cài đặt" />
 </menu>
