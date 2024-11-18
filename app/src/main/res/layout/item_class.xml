@@ -27,26 +27,14 @@
             tools:text="Lớp 12A1" />
 
         <TextView
-            android:id="@+id/classDescription"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@id/menuButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/className"
-            tools:text="Môn: Toán học" />
-
-        <TextView
             android:id="@+id/studentCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:drawableStart="@drawable/ic_people"
             android:drawablePadding="4dp"
             android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/classDescription"
             tools:text="45 học sinh" />
 
         <ImageButton
@@ -55,6 +43,7 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_more_vert"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
