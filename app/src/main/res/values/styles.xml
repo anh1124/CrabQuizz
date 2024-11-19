@@ -3,4 +3,10 @@
     <style name="BottomNavigationViewTextStyle">
         <item name="android:textSize">12sp</item>
     </style>
+    <style name="FullScreenDialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@color/white</item>
+    </style>
 </resources>

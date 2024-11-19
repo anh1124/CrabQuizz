@@ -5,39 +5,34 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.crabquizz.Adapter.QuestionAdapter;
+import com.example.crabquizz.Scripts.Adapter.QuestionAdapter;
+import com.example.crabquizz.Scripts.Dialog.QuestionDialog;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.Question;
 import com.example.crabquizz.Scripts.Models.QuestionPack;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 
-public class QuestionCreateFragment extends Fragment {
+public class QuestionCreateFragment extends Fragment implements QuestionAdapter.QuestionInteractionListener {
     private DbContext dbContext;
-
-    private TextInputEditText questionInput, optionAInput, optionBInput, optionCInput, optionDInput;
-    private RadioGroup correctAnswerGroup;
-    private ImageButton addQuestionButton, deleteQuestionButton;
-    private TextView questionNumber;
-    private Button finishButton;
-    private RecyclerView questionRecyclerView;
+    private String packId, teacherId, title, description, topic;
+    private ArrayList<Question> questions = new ArrayList<>();
     private QuestionAdapter questionAdapter;
 
-    private String packId, teacherId, title, description, topic;
-    private int currentQuestionIndex = 1;
-    private ArrayList<Question> questions = new ArrayList<>();
+    // UI Components
+    private RecyclerView questionRecyclerView;
+    private FloatingActionButton addQuestionButton;
+    private Button finishButton;
+    private ProgressBar loadingProgress;
+    private View emptyStateLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,73 +53,91 @@ public class QuestionCreateFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_question_create, container, false);
         initializeViews(view);
-        setupRecyclerView(view);
+        setupRecyclerView();
         setupClickListeners();
+        updateEmptyState();
         return view;
     }
 
     private void initializeViews(View view) {
-        questionInput = view.findViewById(R.id.questionInput);
-        optionAInput = view.findViewById(R.id.optionAInput);
-        optionBInput = view.findViewById(R.id.optionBInput);
-        optionCInput = view.findViewById(R.id.optionCInput);
-        optionDInput = view.findViewById(R.id.optionDInput);
-        correctAnswerGroup = view.findViewById(R.id.correctAnswerGroup);
+        questionRecyclerView = view.findViewById(R.id.questionsRecyclerView);
         addQuestionButton = view.findViewById(R.id.AddQuestionButton);
-        deleteQuestionButton = view.findViewById(R.id.deleteQuestionButton);
-        questionNumber = view.findViewById(R.id.questionNumber);
         finishButton = view.findViewById(R.id.finishButton);
-
-        updateQuestionNumber();
+        loadingProgress = view.findViewById(R.id.loadingProgress);
+        emptyStateLayout = view.findViewById(R.id.emptyStateLayout);
     }
 
-    private void setupRecyclerView(View view) {
-        questionRecyclerView = view.findViewById(R.id.questionsRecyclerView);
-        questionAdapter = new QuestionAdapter(questions);
+    private void setupRecyclerView() {
+        questionAdapter = new QuestionAdapter(questions, this);
         questionRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         questionRecyclerView.setAdapter(questionAdapter);
     }
 
     private void setupClickListeners() {
-        addQuestionButton.setOnClickListener(v -> addNewQuestionForm());
-        deleteQuestionButton.setOnClickListener(v -> clearForm());
+        addQuestionButton.setOnClickListener(v -> showAddQuestionDialog());
         finishButton.setOnClickListener(v -> finishQuestionPack());
     }
 
-    private void addNewQuestionForm() {
-        if (validateInputs()) {
-            Question currentQuestion = createQuestionFromInputs();
-            questions.add(currentQuestion);
+    private void showAddQuestionDialog() {
+        // Tạo một instance mới của QuestionDialog
+        QuestionDialog dialog = new QuestionDialog(requireContext(), null, question -> {
+            questions.add(question);
             questionAdapter.notifyItemInserted(questions.size() - 1);
+            updateEmptyState();
+        });
+        dialog.show();
+    }
 
-            currentQuestionIndex++;
-            updateQuestionNumber();
-            clearForm();
-            showToast("Câu hỏi đã được thêm!");
+    @Override
+    public void onQuestionEdit(Question question) {
+        // Hiển thị dialog chỉnh sửa với dữ liệu câu hỏi hiện tại
+        QuestionDialog dialog = new QuestionDialog(requireContext(), question, editedQuestion -> {
+            int position = questions.indexOf(question);
+            if (position != -1) {
+                questions.set(position, editedQuestion);
+                questionAdapter.notifyItemChanged(position);
+            }
+        });
+        dialog.show();
+    }
+
+    @Override
+    public void onQuestionDelete(Question question) {
+        int position = questions.indexOf(question);
+        if (position != -1) {
+            questions.remove(position);
+            questionAdapter.notifyItemRemoved(position);
+            updateEmptyState();
+            showToast("Câu hỏi đã được xóa!");
+        }
+    }
+
+    private void updateEmptyState() {
+        if (questions.isEmpty()) {
+            emptyStateLayout.setVisibility(View.VISIBLE);
+            questionRecyclerView.setVisibility(View.GONE);
         } else {
-            showToast("Vui lòng điền đầy đủ thông tin câu hỏi.");
+            emptyStateLayout.setVisibility(View.GONE);
+            questionRecyclerView.setVisibility(View.VISIBLE);
         }
     }
 
     private void finishQuestionPack() {
-        if (validateInputs()) {
-            Question currentQuestion = createQuestionFromInputs();
-            questions.add(currentQuestion);
-        }
-
         if (questions.isEmpty()) {
             showToast("Vui lòng thêm ít nhất một câu hỏi");
             return;
         }
 
+        loadingProgress.setVisibility(View.VISIBLE);
         saveQuestionPack(() -> {
+            loadingProgress.setVisibility(View.GONE);
             showToast("Đã hoàn thành bộ câu hỏi");
             requireActivity().getSupportFragmentManager().popBackStack();
         });
     }
 
     private void saveQuestionPack(Runnable onSuccess) {
-        String questionJson = convertQuestionsToJson();
+        String questionJson = new Gson().toJson(questions);
         QuestionPack questionPack = new QuestionPack(packId, teacherId, title, description, topic, questionJson);
 
         dbContext.add("questionpacks", questionPack)
@@ -133,61 +146,10 @@ public class QuestionCreateFragment extends Fragment {
                         onSuccess.run();
                     }
                 })
-                .addOnFailureListener(e -> showToast("Lỗi khi lưu dữ liệu: " + e.getMessage()));
-    }
-
-    private String convertQuestionsToJson() {
-        Gson gson = new Gson();
-        return gson.toJson(questions);
-    }
-
-    private Question createQuestionFromInputs() {
-        String questionText = questionInput.getText().toString().trim();
-        String answer1 = optionAInput.getText().toString().trim();
-        String answer2 = optionBInput.getText().toString().trim();
-        String answer3 = optionCInput.getText().toString().trim();
-        String answer4 = optionDInput.getText().toString().trim();
-        int correctAnswer = getCorrectAnswerNumber(correctAnswerGroup.getCheckedRadioButtonId());
-
-        return new Question(Math.abs(String.valueOf(System.currentTimeMillis()).hashCode()), questionText, answer1, answer2, answer3, answer4, correctAnswer);
-    }
-
-    private boolean validateInputs() {
-        return !questionInput.getText().toString().trim().isEmpty() &&
-                !optionAInput.getText().toString().trim().isEmpty() &&
-                !optionBInput.getText().toString().trim().isEmpty() &&
-                !optionCInput.getText().toString().trim().isEmpty() &&
-                !optionDInput.getText().toString().trim().isEmpty() &&
-                correctAnswerGroup.getCheckedRadioButtonId() != -1;
-    }
-
-    private void clearForm() {
-        questionInput.setText("");
-        optionAInput.setText("");
-        optionBInput.setText("");
-        optionCInput.setText("");
-        optionDInput.setText("");
-        correctAnswerGroup.clearCheck();
-    }
-
-    private void updateQuestionNumber() {
-        questionNumber.setText(String.format("Câu hỏi số %d", currentQuestionIndex));
-        deleteQuestionButton.setEnabled(currentQuestionIndex > 1);
-    }
-
-    private int getCorrectAnswerNumber(int radioButtonId) {
-        switch (radioButtonId) {
-            case R.id.optionARadio:
-                return 1;
-            case R.id.optionBRadio:
-                return 2;
-            case R.id.optionCRadio:
-                return 3;
-            case R.id.optionDRadio:
-                return 4;
-            default:
-                return 1;
-        }
+                .addOnFailureListener(e -> {
+                    loadingProgress.setVisibility(View.GONE);
+                    showToast("Lỗi khi lưu dữ liệu: " + e.getMessage());
+                });
     }
 
     private void showToast(String message) {
