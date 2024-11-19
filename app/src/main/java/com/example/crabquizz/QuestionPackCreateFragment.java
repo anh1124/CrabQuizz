@@ -82,6 +82,7 @@ public class QuestionPackCreateFragment extends Fragment {
     }
 
     private void navigateToQuestionCreateFragment(QuestionPack questionPack) {
+        String packId = dbContext.db.collection("questionpacks").document().getId();
         Bundle bundle = new Bundle();
         bundle.putString("packId", questionPack.getId());
         bundle.putString("teacherId", questionPack.getTeacherId());

@@ -20,6 +20,7 @@ import com.example.crabquizz.Scripts.Models.QuestionPack;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class QuestionCreateFragment extends Fragment implements QuestionAdapter.QuestionInteractionListener {
     private DbContext dbContext;
@@ -38,9 +39,10 @@ public class QuestionCreateFragment extends Fragment implements QuestionAdapter.
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dbContext = DbContext.getInstance();
+        packId = UUID.randomUUID().toString();
 
         if (getArguments() != null) {
-            packId = getArguments().getString("packId");
+            //packId = getArguments().getString("id");
             teacherId = getArguments().getString("teacherId");
             title = getArguments().getString("title");
             description = getArguments().getString("description");
@@ -132,7 +134,12 @@ public class QuestionCreateFragment extends Fragment implements QuestionAdapter.
         saveQuestionPack(() -> {
             loadingProgress.setVisibility(View.GONE);
             showToast("Đã hoàn thành bộ câu hỏi");
-            requireActivity().getSupportFragmentManager().popBackStack();
+
+            // Create a new QuestionFragment and navigate to it
+            QuestionFragment questionFragment = new QuestionFragment();
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, questionFragment)
+                    .commit();
         });
     }
 
