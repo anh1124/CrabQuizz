@@ -6,61 +6,44 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.example.crabquizz.Scripts.Controller.TransitionFragemt;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.crabquizz.Adapter.QuestionAdapter;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.Question;
 import com.example.crabquizz.Scripts.Models.QuestionPack;
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
 public class QuestionCreateFragment extends Fragment {
-    private FirebaseDatabase database;
-    private DatabaseReference questionsRef;
-
-    private TextInputEditText questionInput;
-    private TextInputEditText optionAInput;
-    private TextInputEditText optionBInput;
-    private TextInputEditText optionCInput;
-    private TextInputEditText optionDInput;
-    private RadioGroup correctAnswerGroup;
-    private ImageButton addQuestionButton;
-    private ImageButton deleteQuestionButton;
-    private TextView questionNumber;
-    private Button finishButton;
     private DbContext dbContext;
 
-    // QuestionPack details
-    private String packId;
-    private String teacherId;
-    private String title;
-    private String description;
-    private String topic;
+    private TextInputEditText questionInput, optionAInput, optionBInput, optionCInput, optionDInput;
+    private RadioGroup correctAnswerGroup;
+    private ImageButton addQuestionButton, deleteQuestionButton;
+    private TextView questionNumber;
+    private Button finishButton;
+    private RecyclerView questionRecyclerView;
+    private QuestionAdapter questionAdapter;
 
-    // Questions management
+    private String packId, teacherId, title, description, topic;
     private int currentQuestionIndex = 1;
     private ArrayList<Question> questions = new ArrayList<>();
-    private static final String QUESTION_PACKS_COLLECTION = "questionpacks";
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        database = FirebaseDatabase.getInstance();
         dbContext = DbContext.getInstance();
 
-        // Extract QuestionPack details from arguments
         if (getArguments() != null) {
             packId = getArguments().getString("packId");
             teacherId = getArguments().getString("teacherId");
@@ -75,13 +58,12 @@ public class QuestionCreateFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_question_create, container, false);
         initializeViews(view);
+        setupRecyclerView(view);
         setupClickListeners();
-        TransitionFragemt.initializeMenuNavigation(requireContext(), getParentFragmentManager(), view);
         return view;
     }
 
     private void initializeViews(View view) {
-        // Find and initialize all view components
         questionInput = view.findViewById(R.id.questionInput);
         optionAInput = view.findViewById(R.id.optionAInput);
         optionBInput = view.findViewById(R.id.optionBInput);
@@ -93,73 +75,38 @@ public class QuestionCreateFragment extends Fragment {
         questionNumber = view.findViewById(R.id.questionNumber);
         finishButton = view.findViewById(R.id.finishButton);
 
-        // Update UI
         updateQuestionNumber();
+    }
+
+    private void setupRecyclerView(View view) {
+        questionRecyclerView = view.findViewById(R.id.questionsRecyclerView);
+        questionAdapter = new QuestionAdapter(questions);
+        questionRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        questionRecyclerView.setAdapter(questionAdapter);
     }
 
     private void setupClickListeners() {
         addQuestionButton.setOnClickListener(v -> addNewQuestionForm());
-        deleteQuestionButton.setOnClickListener(v -> deleteQuestion());
+        deleteQuestionButton.setOnClickListener(v -> clearForm());
         finishButton.setOnClickListener(v -> finishQuestionPack());
     }
 
-    private void loadCurrentQuestion() {
-        if (!questions.isEmpty() && currentQuestionIndex <= questions.size()) {
-            Question currentQuestion = questions.get(currentQuestionIndex - 1);
-            questionInput.setText(currentQuestion.getQuestion());
-            optionAInput.setText(currentQuestion.getAnswer1());
-            optionBInput.setText(currentQuestion.getAnswer2());
-            optionCInput.setText(currentQuestion.getAnswer3());
-            optionDInput.setText(currentQuestion.getAnswer4());
-            setCorrectAnswerRadioButton(currentQuestion.getCorrectAnswer());
+    private void addNewQuestionForm() {
+        if (validateInputs()) {
+            Question currentQuestion = createQuestionFromInputs();
+            questions.add(currentQuestion);
+            questionAdapter.notifyItemInserted(questions.size() - 1);
+
+            currentQuestionIndex++;
+            updateQuestionNumber();
+            clearForm();
+            showToast("Câu hỏi đã được thêm!");
+        } else {
+            showToast("Vui lòng điền đầy đủ thông tin câu hỏi.");
         }
     }
 
-    private void addNewQuestionForm() {
-
-    }
-
-    private void deleteQuestion() {
-        clearForm();
-    }
-
-    private void saveQuestionPack(Runnable onSuccess) {
-        // Convert questions to JSON
-        String questionJson = convertQuestionsToJson();
-
-        // Tạo QuestionPack
-        QuestionPack questionPack = new QuestionPack(
-                packId,
-                teacherId,
-                title,
-                description,
-                topic,
-                questionJson
-        );
-
-        // Lưu QuestionPack vào Firestore qua DbContext
-        DbContext dbContext = DbContext.getInstance();
-        dbContext.add(QUESTION_PACKS_COLLECTION, questionPack)
-                .addOnSuccessListener(aVoid -> {
-                    if (onSuccess != null) {
-                        onSuccess.run();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    showToast("Lỗi khi lưu dữ liệu: " + e.getMessage());
-                });
-    }
-
-
-    private String convertQuestionsToJson() {
-        // Convert questions list to JSON string
-        // You'll need to add a JSON library like Gson to your project
-        Gson gson = new Gson();
-        return gson.toJson(questions);
-    }
-
     private void finishQuestionPack() {
-        // Validate that the current form is complete before adding to list
         if (validateInputs()) {
             Question currentQuestion = createQuestionFromInputs();
             questions.add(currentQuestion);
@@ -170,11 +117,28 @@ public class QuestionCreateFragment extends Fragment {
             return;
         }
 
-        // Save final version and return to main screen
         saveQuestionPack(() -> {
             showToast("Đã hoàn thành bộ câu hỏi");
             requireActivity().getSupportFragmentManager().popBackStack();
         });
+    }
+
+    private void saveQuestionPack(Runnable onSuccess) {
+        String questionJson = convertQuestionsToJson();
+        QuestionPack questionPack = new QuestionPack(packId, teacherId, title, description, topic, questionJson);
+
+        dbContext.add("questionpacks", questionPack)
+                .addOnSuccessListener(aVoid -> {
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
+                })
+                .addOnFailureListener(e -> showToast("Lỗi khi lưu dữ liệu: " + e.getMessage()));
+    }
+
+    private String convertQuestionsToJson() {
+        Gson gson = new Gson();
+        return gson.toJson(questions);
     }
 
     private Question createQuestionFromInputs() {
@@ -185,15 +149,7 @@ public class QuestionCreateFragment extends Fragment {
         String answer4 = optionDInput.getText().toString().trim();
         int correctAnswer = getCorrectAnswerNumber(correctAnswerGroup.getCheckedRadioButtonId());
 
-        return new Question(
-                Math.abs(String.valueOf(System.currentTimeMillis()).hashCode()),
-                questionText,
-                answer1,
-                answer2,
-                answer3,
-                answer4,
-                correctAnswer
-        );
+        return new Question(Math.abs(String.valueOf(System.currentTimeMillis()).hashCode()), questionText, answer1, answer2, answer3, answer4, correctAnswer);
     }
 
     private boolean validateInputs() {
@@ -217,27 +173,6 @@ public class QuestionCreateFragment extends Fragment {
     private void updateQuestionNumber() {
         questionNumber.setText(String.format("Câu hỏi số %d", currentQuestionIndex));
         deleteQuestionButton.setEnabled(currentQuestionIndex > 1);
-    }
-
-    private void setCorrectAnswerRadioButton(int correctAnswer) {
-        int radioButtonId;
-        switch (correctAnswer) {
-            case 1:
-                radioButtonId = R.id.optionARadio;
-                break;
-            case 2:
-                radioButtonId = R.id.optionBRadio;
-                break;
-            case 3:
-                radioButtonId = R.id.optionCRadio;
-                break;
-            case 4:
-                radioButtonId = R.id.optionDRadio;
-                break;
-            default:
-                radioButtonId = R.id.optionARadio;
-        }
-        correctAnswerGroup.check(radioButtonId);
     }
 
     private int getCorrectAnswerNumber(int radioButtonId) {
