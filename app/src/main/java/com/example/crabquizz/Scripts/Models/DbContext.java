@@ -21,7 +21,7 @@ public class DbContext {
     // Collections
 
     public final String USERS_COLLECTION = "users";
-
+    public final String CLASSES_COLLECTION = "classes";
 
 
     public final String APP_SETUP = "appsetup";
@@ -64,6 +64,12 @@ public class DbContext {
         return USERS_COLLECTION;
     }
 
+    public Task<QuerySnapshot> query(String collection, String field, Object value) {
+        return FirebaseFirestore.getInstance()
+                .collection(collection)
+                .whereEqualTo(field, value)
+                .get();
+    }
 
     // Generic methods for CRUD operations
     public Task<Void> add(String collection, Object data) {
