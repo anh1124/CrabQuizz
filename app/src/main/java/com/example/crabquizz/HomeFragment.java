@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
+import com.example.crabquizz.Scripts.Controller.StudentClassController;
 
 /**
  * Fragment hiển thị màn hình chính của ứng dụng
@@ -27,8 +28,8 @@ public class HomeFragment extends Fragment {
     // UI Components
     private TextView tvGreeting;          // Hiển thị lời chào
     private Button btnLoginSignup;        // Nút đăng nhập/đăng ký
-    private Button btnStartQuiz;          // Nút bắt đầu quiz
-    private EditText edtQuizCode;         // Ô nhập mã quiz
+    private Button btnJoinClass;          // Nút tham gia class
+    private EditText editClassCode;         // Ô nhập mã class
     private ImageView imageView;          // Ảnh logo
     private View rootView;                // View gốc của fragment
 
@@ -41,7 +42,7 @@ public class HomeFragment extends Fragment {
             setGreeting();
             showLoginSignupButton();
             setupImage();
-            setupQuizControls();
+
             return rootView;
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreateView: ", e);
@@ -50,24 +51,8 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    /**
-     * Khởi tạo và cài đặt các controls liên quan đến quiz
-     */
-    private void setupQuizControls() {
-        edtQuizCode = rootView.findViewById(R.id.edtQuizCode);
-        btnStartQuiz = rootView.findViewById(R.id.btnStartQuiz);
 
-        if (btnStartQuiz != null) {
-            btnStartQuiz.setOnClickListener(v -> {
-                String quizCode = edtQuizCode.getText().toString().trim();
-                if (!quizCode.isEmpty()) {
-                    showToast("Bắt đầu quiz với mã: " + quizCode);
-                } else {
-                    showToast("Vui lòng nhập mã tham gia");
-                }
-            });
-        }
-    }
+
 
     /**
      * Hiển thị hoặc ẩn nút đăng nhập/đăng ký dựa trên trạng thái người dùng
@@ -119,12 +104,62 @@ public class HomeFragment extends Fragment {
         btnLoginSignup = rootView.findViewById(R.id.btnLoginSignup);
         imageView = rootView.findViewById(R.id.imageView);
 
+
         if (btnLoginSignup != null) {
             btnLoginSignup.setOnClickListener(v -> {
                 Intent intent = new Intent(requireActivity(), Register.class);
                 startActivity(intent);
             });
         }
+
+
+        editClassCode = rootView.findViewById(R.id.edtClassCode);
+        btnJoinClass = rootView.findViewById(R.id.btnJoinClass);
+
+        //join class btn
+        btnJoinClass.setOnClickListener(v -> {
+            if(IsLogin())
+            {
+                String classCode = editClassCode.getText().toString().trim();
+                if (!classCode.isEmpty()) {
+                    showToast("Đang kiểm tra mã lớp...");
+
+                    StudentClassController controller = new StudentClassController();
+                    controller.getClassById(classCode)
+                            .addOnSuccessListener(studentClass -> {
+                                Log.e("getClassById", "Class ID: " + studentClass.getId() + ", Class Name: " + studentClass.getName() + ", Student Count: " + studentClass.getStudentCount());
+                                if (studentClass != null) {
+                                    Intent intent = new Intent(requireActivity(), JoinAndInfoClass.class);
+                                    // Gửi thông tin lớp qua Intent
+                                    intent.putExtra("classId", studentClass.getId());
+                                    intent.putExtra("className", studentClass.getName());
+                                    intent.putExtra("studentCount", studentClass.getStudentCount());
+                                    startActivity(intent);
+                                } else {
+                                    showToast("Không tìm thấy lớp với mã này.");
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error fetching class: ", e);
+                                showToast("Đã xảy ra lỗi khi kiểm tra mã lớp.");
+                            });
+                } else {
+                    showToast("Vui lòng nhập mã tham gia.");
+                }
+            }
+            else
+            {
+                showToast("Vui lòng đăng nhập trước khi tham gia lớp.");
+            }
+
+        });
+    }
+    private boolean IsLogin()
+    {
+        if(SessionManager.getInstance(requireContext()).isLogin()) {
+            return true;
+        }
+        return false;
     }
 
     /**

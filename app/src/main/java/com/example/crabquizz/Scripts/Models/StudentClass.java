@@ -8,10 +8,12 @@ public class StudentClass {
     private String name;
     private int teacherId;
     private List<Integer> studentIds;
+    private String questionPackIdNowForExam;
 
     public StudentClass() {
         // Required empty constructor for Firestore
         studentIds = new ArrayList<>();
+        questionPackIdNowForExam = "";
     }
 
     // Getters and Setters
@@ -47,6 +49,16 @@ public class StudentClass {
         this.studentIds = studentIds;
     }
 
+    public String getquestionPackIdNowForExam() {
+        return questionPackIdNowForExam;
+    }
+
+    public void setquestionPackIdNowForExam(String questionPackIdNowForExam) {
+        this.questionPackIdNowForExam = questionPackIdNowForExam;
+    }
+
+
+
     public int getStudentCount() {
         return studentIds != null ? studentIds.size() : 0;
     }
@@ -65,4 +77,5 @@ public class StudentClass {
             studentIds.remove(Integer.valueOf(studentId));
         }
     }
+
 }
