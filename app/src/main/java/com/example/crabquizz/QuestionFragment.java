@@ -33,6 +33,7 @@ public class QuestionFragment extends Fragment implements QuestionPackAdapter.On
     private ExtendedFloatingActionButton createQuestionPackButton;
     private DbContext dbContext;
     private NavigationController navigationController;
+    private Button buttonStore;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,15 +51,17 @@ public class QuestionFragment extends Fragment implements QuestionPackAdapter.On
         initializeViews(rootView);
         setupRecyclerView();
         setupClickListeners();
-        loadQuestionPacks();
+        //loadQuestionPacks();
         TransitionFragemt.initializeMenuNavigation(requireContext(), getParentFragmentManager(), rootView);
+        Transiton();
 
         return rootView;
     }
 
     private void initializeViews(View rootView) {
         recyclerView = rootView.findViewById(R.id.questionsRecyclerView);
-        createQuestionPackButton = rootView.findViewById(R.id.button2);
+        createQuestionPackButton = rootView.findViewById(R.id.fabCreateQuestion);
+        buttonStore = rootView.findViewById(R.id.buttonStore);
     }
 
     private void setupRecyclerView() {
@@ -93,20 +96,20 @@ public class QuestionFragment extends Fragment implements QuestionPackAdapter.On
         });
     }
 
-    private void loadQuestionPacks() {
-        DbContext.getInstance()
-                .getAll("questionpacks") // Giả sử collection name là "questionpacks"
-                .addOnSuccessListener(querySnapshots -> {
-                    questionPacks.clear();
-                    List<QuestionPack> packs = DbContext.getInstance()
-                            .convertToList(querySnapshots, QuestionPack.class);
-                    questionPacks.addAll(packs);
-                    adapter.updateData(questionPacks);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error loading question packs", Toast.LENGTH_SHORT).show();
-                });
-    }
+//    private void loadQuestionPacks() {
+//        DbContext.getInstance()
+//                .getAll("questionpacks") // Giả sử collection name là "questionpacks"
+//                .addOnSuccessListener(querySnapshots -> {
+//                    questionPacks.clear();
+//                    List<QuestionPack> packs = DbContext.getInstance()
+//                            .convertToList(querySnapshots, QuestionPack.class);
+//                    questionPacks.addAll(packs);
+//                    adapter.updateData(questionPacks);
+//                })
+//                .addOnFailureListener(e -> {
+//                    Toast.makeText(getContext(), "Error loading question packs", Toast.LENGTH_SHORT).show();
+//                });
+//    }
 
     @Override
     public void onQuestionPackClick(QuestionPack questionPack) {
@@ -116,5 +119,14 @@ public class QuestionFragment extends Fragment implements QuestionPackAdapter.On
         args.putString("packId", questionPack.getId());
         quizFragment.setArguments(args);
         navigationController.navigateTo(quizFragment);
+    }
+    public void Transiton(){
+        buttonStore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(requireActivity(), StorageQuestionPackActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

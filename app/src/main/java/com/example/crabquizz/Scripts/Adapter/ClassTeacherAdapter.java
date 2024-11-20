@@ -1,6 +1,8 @@
 package com.example.crabquizz.Scripts.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.crabquizz.R;
 import com.example.crabquizz.Scripts.Controller.StudentClassController;
+import com.example.crabquizz.Scripts.Models.QuestionPack;
 import com.example.crabquizz.Scripts.Models.StudentClass;
 import com.example.crabquizz.Scripts.Models.DbContext;
+import com.example.crabquizz.StorageQuestionPackActivity;
 
 import java.util.List;
 
@@ -43,47 +47,47 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
     }
 
     private void addExam(Context context, ClassViewHolder holder, StudentClass studentClass) {
+        // Tạo một Intent để mở StorageQuestionPackActivity cho việc chọn bộ câu hỏi
+        Intent intent = new Intent(context, StorageQuestionPackActivity.class);
 
-        //lò thiện sửa id chỗ này
-        /*
-        *
-        *  _         _   _     _                                          _
-        | | ___   | |_| |__ (_) ___ _ __    ___ _   _  __ _    ___ __ _(_)
-        | |/ _ \  | __| '_ \| |/ _ \ '_ \  / __| | | |/ _` |  / __/ _` | |
-        | | (_) | | |_| | | | |  __/ | | |_\__ \ |_| | (_| | | (_| (_| | |
-        |_|\___/   \__|_| |_|_|\___|_| |_( )___/\__,_|\__,_|  \___\__,_|_|
-        | |__   __ _ _ __ ___    _ __   _|/_ _   _
-        | '_ \ / _` | '_ ` _ \  | '_ \ / _` | | | |
-        | | | | (_| | | | | | | | | | | (_| | |_| |
-        |_| |_|\__,_|_| |_| |_| |_| |_|\__,_|\__, |
-                                             |___/
-        *
-        *
-        * */
+        // Đặt callback để xử lý sự kiện khi người dùng chọn một bộ câu hỏi
+        StorageQuestionPackActivity.setExamCallback(new QuestionPackAdapter.OnQuestionPackClickListener() {
+            @Override
+            public void onQuestionPackClick(QuestionPack questionPack) {
+                // Cập nhật ID bộ câu hỏi được chọn vào studentClass
+                studentClass.setquestionPackIdNowForExam(questionPack.getId());
 
-        studentClass.setquestionPackIdNowForExam("555"); // Gán ID bài kiểm tra mới
+                // Cập nhật thông tin studentClass vào cơ sở dữ liệu
+                dbContext.update(dbContext.CLASSES_COLLECTION, studentClass.getId(), studentClass)
+                        .addOnSuccessListener(aVoid -> {
+                            // Thông báo cho người dùng về kết quả thêm bài kiểm tra
+                            Toast.makeText(context, "Đã thêm bài kiểm tra mới", Toast.LENGTH_SHORT).show();
 
-        dbContext.update(dbContext.CLASSES_COLLECTION, studentClass.getId(), studentClass)
-                .addOnSuccessListener(aVoid -> {
-                    // Cập nhật thành công
-                    Toast.makeText(context, "Đã thêm bài kiểm tra mới", Toast.LENGTH_SHORT).show();
+                            // Cập nhật lại danh sách các lớp học trong UI
+                            int position = classes.indexOf(studentClass);
+                            if (position != -1) {
+                                classes.set(position, studentClass);
+                                notifyDataSetChanged();
 
-                    // Cập nhật danh sách và giao diện
-                    int position = classes.indexOf(studentClass);
-                    if (position != -1) {
-                        classes.set(position, studentClass);
-                        notifyDataSetChanged();
+                                // Hiển thị lại menu với giá trị mới của question pack
+                                showPopupMenu(context, holder.menuButton, holder, studentClass, questionPack.getId());
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            // Thông báo lỗi nếu có sự cố khi thêm bài kiểm tra
+                            Toast.makeText(context, "Lỗi khi thêm bài kiểm tra: " + e.getMessage(), Toast.LENGTH_SHORT).show();
 
-                        // Hiển thị lại menu với giá trị mới
-                        showPopupMenu(context, holder.menuButton, holder, studentClass, "555");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(context, "Lỗi khi thêm bài kiểm tra: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    studentClass.setquestionPackIdNowForExam("0");
-                    notifyDataSetChanged();
-                });
+                            // Khôi phục lại giá trị ban đầu nếu xảy ra lỗi
+                            studentClass.setquestionPackIdNowForExam("0");
+                            notifyDataSetChanged();
+                        });
+            }
+        });
+
+        // Bắt đầu Activity để người dùng chọn bộ câu hỏi
+        context.startActivity(intent);
     }
+
 
 
     private void stopExam(Context context, StudentClass studentClass) {

@@ -1,5 +1,6 @@
 package com.example.crabquizz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -136,10 +137,12 @@ public class QuestionCreateFragment extends Fragment implements QuestionAdapter.
             showToast("Đã hoàn thành bộ câu hỏi");
 
             // Create a new QuestionFragment and navigate to it
-            QuestionFragment questionFragment = new QuestionFragment();
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, questionFragment)
-                    .commit();
+//            QuestionFragment questionFragment = new QuestionFragment();
+//            requireActivity().getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, questionFragment)
+//                    .commit();
+        Intent intent = new Intent(requireActivity() , StorageQuestionPackActivity.class);
+        startActivity(intent);
         });
     }
 
