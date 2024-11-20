@@ -11,4 +11,13 @@
         android:title="Copy ID"
         android:icon="@drawable/ic_copy"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_add_exam"
+        android:title="Thêm bài kiểm tra"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_stop_now_exam"
+        android:title="Dừng bài kiểm tra"
+        app:showAsAction="never" />
+
 </menu>

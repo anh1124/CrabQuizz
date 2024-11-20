@@ -85,6 +85,15 @@ public class SessionManager {
 
         //public void newUserSession(){user = new User();}
     }
+
+    public boolean isLogin() {
+        if (userTEMPSession != null && userTEMPSession.getUser() != null) {
+            String role = userTEMPSession.getUser().getRole();
+            return role.equals("teacher") || role.equals("student");
+        }
+        return false;
+    }
+
     public void showLogUserData()
     {
         Log.d("LOGDATA", "LOG:");

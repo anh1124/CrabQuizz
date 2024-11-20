@@ -2,15 +2,14 @@ package com.example.crabquizz;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
 import com.example.crabquizz.Scripts.Controller.StudentClassController;
 import com.example.crabquizz.Scripts.Models.StudentClass;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.example.crabquizz.Scripts.Adapter.ClassAdapter;
+import com.example.crabquizz.Scripts.Adapter.ClassTeacherAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,7 +25,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.crabquizz.Scripts.Controller.MenuNavigationClickController;
@@ -37,14 +35,14 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ClassFragment#newInstance} factory method to
+ * Use the {@link ScreenTeacherClassFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ClassFragment extends Fragment {
+public class ScreenTeacherClassFragment extends Fragment {
     private RecyclerView classRecyclerView;
     private ProgressBar loadingProgress;
     private View emptyStateLayout;
-    private ClassAdapter classAdapter;
+    private ClassTeacherAdapter classTeacherAdapter;
     private StudentClassController classController;
     private SessionManager sessionManager;
     // TODO: Rename parameter arguments, choose names that match
@@ -56,21 +54,12 @@ public class ClassFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public ClassFragment() {
+    public ScreenTeacherClassFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ClassFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ClassFragment newInstance(String param1, String param2) {
-        ClassFragment fragment = new ClassFragment();
+    public static ScreenTeacherClassFragment newInstance(String param1, String param2) {
+        ScreenTeacherClassFragment fragment = new ScreenTeacherClassFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -80,7 +69,7 @@ public class ClassFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_class, container, false);
+        return inflater.inflate(R.layout.fragment_screen_teacher_class, container, false);
     }
 
     @Override
@@ -136,8 +125,8 @@ public class ClassFragment extends Fragment {
 
         // Set up RecyclerView
         classRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        classAdapter = new ClassAdapter(new ArrayList<>());
-        classRecyclerView.setAdapter(classAdapter);
+        classTeacherAdapter = new ClassTeacherAdapter(new ArrayList<>());
+        classRecyclerView.setAdapter(classTeacherAdapter);
 
         // Initialize controller
         classController = new StudentClassController();
@@ -147,11 +136,7 @@ public class ClassFragment extends Fragment {
         fetchTeacherClasses(teacherId);
     }
 
-    private void goCreateClassAtivity() {
-        // Tạo intent để mở CreateClass Activity
-        Intent intent = new Intent(requireContext(), CreateClass.class);
-        startActivity(intent);
-    }
+
     private void fetchTeacherClasses(int teacherId) {
         showLoading(true);
         Log.d("fetchTeacherClasses", "Fetching classes for teacher: " + teacherId);
@@ -173,7 +158,7 @@ public class ClassFragment extends Fragment {
                                 showEmptyState(true);
                             } else {
                                 showEmptyState(false);
-                                classAdapter.updateData(classes);
+                                classTeacherAdapter.updateData(classes);
                             }
                         } catch (JsonSyntaxException e) {
                             Log.e("fetchTeacherClasses", "Error parsing JSON", e);
@@ -204,7 +189,28 @@ public class ClassFragment extends Fragment {
 
         // Replace with your logic to fetch the logged-in teacher's ID
         int teacherId = sessionManager.getInstance(requireContext()).getUserSession().getUser().getId();
-        Log.e("ClassFragment", String.valueOf(teacherId));
+        Log.e("ScreenTeacherClassFragment", String.valueOf(teacherId));
         return teacherId;
     }
+
+
+    //hàm dưới chịu trách nhiện nhận code refrest trang
+    private static final int REQUEST_CODE_CREATE_CLASS = 1;
+
+    private void goCreateClassAtivity() {
+        // Mở Activity và yêu cầu kết quả
+        Intent intent = new Intent(requireContext(), CreateClass.class);
+        startActivityForResult(intent, REQUEST_CODE_CREATE_CLASS);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_CREATE_CLASS && resultCode == requireActivity().RESULT_OK) {
+            // Khi Activity trả về kết quả, làm mới danh sách lớp
+            int teacherId = getTeacherId();
+            fetchTeacherClasses(teacherId);
+        }
+    }
+//end
 }

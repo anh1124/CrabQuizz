@@ -71,6 +71,7 @@ public class CreateClass extends AppCompatActivity {
     }
     public void backToStudentClassFrament(){
         //trở về fracment trước
+        setResult(RESULT_OK);
         finish();
 
     }

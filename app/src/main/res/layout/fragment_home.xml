@@ -74,25 +74,25 @@
                 android:padding="16dp">
 
                 <EditText
-                    android:id="@+id/edtQuizCode"
+                    android:id="@+id/edtClassCode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/edittext_background"
-                    android:hint="Nhập mã tham gia"
+                    android:hint="Nhập mã tham gia class"
                     android:padding="12dp"
                     android:textSize="16sp"
                     android:inputType="text"
                     android:maxLines="1" />
 
                 <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnStartQuiz"
+                    android:id="@+id/btnJoinClass"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
                     android:background="@drawable/button_primary"
                     android:padding="12dp"
-                    android:text="Tham gia trắc ngiệm"
+                    android:text="Tham gia lớp học"
                     android:textColor="@color/white"
                     android:textSize="16sp" />
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ClassFragment">
+    tools:context=".ScreenStudentClassFragment">
 
     <!-- Header -->
     <androidx.appcompat.widget.Toolbar
@@ -19,44 +19,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Danh sách lớp học"
+            android:text="Lớp học của tôi"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Search Bar -->
-    <EditText
-        android:id="@+id/searchEditText"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:background="@drawable/search_background"
-        android:drawableStart="@drawable/ic_search"
-        android:drawablePadding="8dp"
-        android:hint="Tìm kiếm lớp học..."
-        android:padding="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
-
     <!-- RecyclerView for class list -->
-
-    <!-- Loading Progress -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/classRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:clipToPadding="false"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchEditText"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:layout_constraintVertical_bias="1.0"
         tools:layout_editor_absoluteX="0dp"
         tools:listitem="@layout/item_class" />
 
+    <!-- Loading Progress -->
     <ProgressBar
         android:id="@+id/loadingProgress"
         android:layout_width="wrap_content"
@@ -89,14 +72,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Chưa có lớp học nào"
+            android:text="Bạn chưa tham gia lớp học nào"
             android:textSize="16sp" />
 
     </LinearLayout>
 
-    <!-- Add Class FAB -->
+    <!-- Join Class FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addClassFab"
+        android:id="@+id/joinClassFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"

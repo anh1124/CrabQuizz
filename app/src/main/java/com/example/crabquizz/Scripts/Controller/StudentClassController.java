@@ -1,5 +1,7 @@
 package com.example.crabquizz.Scripts.Controller;
 import android.util.Log;
+import android.view.Menu;
+
 import com.example.crabquizz.Scripts.Models.StudentClass;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.google.android.gms.tasks.Task;
@@ -120,6 +122,35 @@ public class StudentClassController {
                     throw new RuntimeException("Class not found");
                 });
     }
+    public Task<String> getClassesForStudentAsJson(int studentId) {
+        // Query all classes
+        return dbContext.db.collection(dbContext.CLASSES_COLLECTION)
+                .get()
+                .continueWith(task -> {
+                    if (!task.isSuccessful() || task.getResult() == null) {
+                        Log.e(TAG, "Error fetching classes", task.getException());
+                        return "[]";  // Return empty array if failed
+                    }
+
+                    QuerySnapshot querySnapshot = task.getResult();
+                    List<StudentClass> studentClasses = new ArrayList<>();
+
+                    // Loop through the classes and check if the studentId is in the studentIds list
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                        StudentClass studentClass = document.toObject(StudentClass.class);
+                        if (studentClass != null && studentClass.getStudentIds().contains(studentId)) {
+                            studentClass.setId(document.getId());
+                            studentClasses.add(studentClass);
+                        }
+                    }
+
+                    // Convert the list of classes to JSON
+                    Gson gson = new GsonBuilder().serializeNulls().create();
+                    String json = gson.toJson(studentClasses);
+                    Log.d(TAG, "Fetched student classes JSON: " + json);
+                    return json;
+                });
+    }
 
     // Remove a student from a class
     public Task<Void> removeStudentFromClass(String classId, int studentId) {
@@ -165,7 +196,22 @@ public class StudentClassController {
                 .addOnSuccessListener(querySnapshot -> Log.d(TAG, "Fetched all classes successfully"))
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to fetch classes", e));
     }
+    public Task<Void> exitClassForStudent(String classId, int studentId) {
+        return dbContext.getById(CLASS_COLLECTION, classId)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful() || task.getResult() == null) {
+                        throw new RuntimeException("Failed to find class");
+                    }
 
+                    DocumentSnapshot document = task.getResult();
+                    StudentClass studentClass = document.toObject(StudentClass.class);
+                    if (studentClass != null) {
+                        studentClass.removeStudentId(studentId);
+                        return dbContext.update(CLASS_COLLECTION, classId, studentClass);
+                    }
+                    throw new RuntimeException("Class not found");
+                });
+    }
     /**
      * Lấy danh sách học sinh trong class dựa trên classId
      * @param classId ID của class
@@ -192,6 +238,7 @@ public class StudentClassController {
         classData.put("name", className);
         classData.put("teacherId", teacherId);
         classData.put("studentIds", new ArrayList<>()); // Initialize empty student list
+        classData.put("setquestionPackIdNowForExam","0");
 
         // Add the class to Firestore
         dbContext.db.collection(dbContext.CLASSES_COLLECTION) // Use dbContext instance
@@ -220,6 +267,39 @@ public class StudentClassController {
     public interface OnClassCreationCallback {
         void onClassCreated(boolean success, String message);
     }
+
+    public Task<String> getQuestionPackIdForClass(String classId) {
+        return dbContext.getById(CLASS_COLLECTION, classId)
+                .continueWith(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        StudentClass studentClass = document.toObject(StudentClass.class);
+                        if (studentClass != null) {
+                            return studentClass.getquestionPackIdNowForExam(); // Trả về giá trị questionPackIdNowForExam
+                        }
+                    }
+                    Log.e(TAG, "Error fetching questionPackId for classId: " + classId, task.getException());
+                    return "0"; // Trả về "0" nếu không tìm thấy hoặc gặp lỗi
+                });
+    }
+    public Task<StudentClass> getClassById(String classId) {
+        return dbContext.getById(CLASS_COLLECTION, classId)
+                .continueWith(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        StudentClass studentClass = document.toObject(StudentClass.class);
+                        if (studentClass != null) {
+                            studentClass.setId(classId); // Đảm bảo gán ID từ Firestore vào đối tượng
+                            return studentClass;
+                        }
+                    }
+                    Log.e(TAG, "Class not found for classId: " + classId, task.getException());
+                    throw new RuntimeException("Class not found.");
+                });
+    }
+
+
+
 
 
 }

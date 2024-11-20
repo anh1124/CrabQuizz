@@ -8,10 +8,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.crabquizz.ClassFragment;
+import com.example.crabquizz.ScreenStudentClassFragment;
+import com.example.crabquizz.ScreenTeacherClassFragment;
 import com.example.crabquizz.HomeFragment;
 import com.example.crabquizz.ProfileFragment;
-import com.example.crabquizz.QuestionCreateFragment;
 import com.example.crabquizz.QuestionFragment;
 import com.example.crabquizz.SearchFragment;
 import com.example.crabquizz.R;
@@ -106,7 +106,7 @@ public class MenuNavigationClickController {
         switch (itemId) {
             case R.id.home: return "HomeFragment";
             case R.id.search: return "SearchFragment";
-            case R.id.myclass: return "ClassFragment";
+            case R.id.myclass: return "ScreenTeacherClassFragment";
             case R.id.question: return "QuestionFragment";
             case R.id.profile: return "ProfileFragment";
             default: return "";
@@ -121,7 +121,7 @@ public class MenuNavigationClickController {
         switch (itemId) {
             case R.id.home: return new HomeFragment();
             case R.id.search: return new SearchFragment();
-            case R.id.myclass: return new ClassFragment();
+            case R.id.myclass: return new ScreenStudentClassFragment();
             case R.id.profile: return new ProfileFragment();
             default: return null;
         }
@@ -133,7 +133,7 @@ public class MenuNavigationClickController {
     private Fragment getFragmentForTeacherNavigation(int itemId) {
         switch (itemId) {
             case R.id.home: return new HomeFragment();
-            case R.id.myclass: return new ClassFragment();
+            case R.id.myclass: return new ScreenTeacherClassFragment();
             case R.id.question: return new QuestionFragment();
             case R.id.profile: return new ProfileFragment();
             default: return null;
