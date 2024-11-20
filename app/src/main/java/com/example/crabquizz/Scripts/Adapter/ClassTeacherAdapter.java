@@ -43,6 +43,24 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
     }
 
     private void addExam(Context context, ClassViewHolder holder, StudentClass studentClass) {
+
+        //lò thiện sửa id chỗ này
+        /*
+        *
+        *  _         _   _     _                                          _
+        | | ___   | |_| |__ (_) ___ _ __    ___ _   _  __ _    ___ __ _(_)
+        | |/ _ \  | __| '_ \| |/ _ \ '_ \  / __| | | |/ _` |  / __/ _` | |
+        | | (_) | | |_| | | | |  __/ | | |_\__ \ |_| | (_| | | (_| (_| | |
+        |_|\___/   \__|_| |_|_|\___|_| |_( )___/\__,_|\__,_|  \___\__,_|_|
+        | |__   __ _ _ __ ___    _ __   _|/_ _   _
+        | '_ \ / _` | '_ ` _ \  | '_ \ / _` | | | |
+        | | | | (_| | | | | | | | | | | (_| | |_| |
+        |_| |_|\__,_|_| |_| |_| |_| |_|\__,_|\__, |
+                                             |___/
+        *
+        *
+        * */
+
         studentClass.setquestionPackIdNowForExam("555"); // Gán ID bài kiểm tra mới
 
         dbContext.update(dbContext.CLASSES_COLLECTION, studentClass.getId(), studentClass)
@@ -134,7 +152,7 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
     // Sửa lại phương thức showPopupMenu để kiểm tra và hiển thị đúng menu items
     private void showPopupMenu(Context context, View view, ClassViewHolder holder, StudentClass studentClass, String questionPackId) {
         PopupMenu popupMenu = new PopupMenu(context, holder.menuButton);
-        popupMenu.inflate(R.menu.class_item_menu);
+        popupMenu.inflate(R.menu.teacher_class_item_menu);
 
         // Kiểm tra trạng thái để hiển thị hoặc ẩn các mục menu
         boolean hasExam = !"0".equals(questionPackId);

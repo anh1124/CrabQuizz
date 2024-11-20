@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ScreenTeacherClassFragment">
-
+    tools:context=".ScreenStudentClassFragment">
 
     <!-- Header -->
     <androidx.appcompat.widget.Toolbar
@@ -20,19 +19,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Danh sách lớp học"
+            android:text="Lớp học của tôi"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Search Bar -->
-
-
     <!-- RecyclerView for class list -->
-
-    <!-- Loading Progress -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/classRecyclerView"
         android:layout_width="match_parent"
@@ -45,6 +39,7 @@
         tools:layout_editor_absoluteX="0dp"
         tools:listitem="@layout/item_class" />
 
+    <!-- Loading Progress -->
     <ProgressBar
         android:id="@+id/loadingProgress"
         android:layout_width="wrap_content"
@@ -77,14 +72,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Chưa có lớp học nào"
+            android:text="Bạn chưa tham gia lớp học nào"
             android:textSize="16sp" />
 
     </LinearLayout>
 
-    <!-- Add Class FAB -->
+    <!-- Join Class FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addClassFab"
+        android:id="@+id/joinClassFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"

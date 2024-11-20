@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.crabquizz.ScreenStudentClassFragment;
 import com.example.crabquizz.ScreenTeacherClassFragment;
 import com.example.crabquizz.HomeFragment;
 import com.example.crabquizz.ProfileFragment;
@@ -117,7 +118,7 @@ public class MenuNavigationClickController {
         switch (itemId) {
             case R.id.home: return new HomeFragment();
             case R.id.search: return new SearchFragment();
-            case R.id.myclass: return new ScreenTeacherClassFragment();
+            case R.id.myclass: return new ScreenStudentClassFragment();
             case R.id.profile: return new ProfileFragment();
             default: return null;
         }

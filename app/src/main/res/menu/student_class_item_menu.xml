@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_exit_class"
+        android:title="Thoát lớp "
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_view_grades"
+        android:title="menu_view_grades"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_take_exam"
+        android:title="làm bài kiểm tra"
+        app:showAsAction="ifRoom" />
+</menu>
