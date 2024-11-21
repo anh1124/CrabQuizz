@@ -81,6 +81,7 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
                             studentClass.setquestionPackIdNowForExam("0");
                             notifyDataSetChanged();
                         });
+
             }
         });
 
@@ -105,7 +106,6 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
                     if (position != -1) {
                         classes.set(position, studentClass);
                     }
-
                     // Cập nhật lại UI
                     notifyDataSetChanged();
                 })

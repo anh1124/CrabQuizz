@@ -49,7 +49,7 @@ public class StorageQuestionPackActivity extends AppCompatActivity implements Qu
 
         // Thêm nút back
         ImageButton backButton = findViewById(R.id.backHomeButton);
-        backButton.setOnClickListener(v -> finish());
+        backButton.setOnClickListener(v -> finishActivity());
     }
 
     private void setupRecyclerView() {
@@ -83,5 +83,8 @@ public class StorageQuestionPackActivity extends AppCompatActivity implements Qu
     protected void onDestroy() {
         super.onDestroy();
         examCallback = null;  // Giải phóng callback để tránh rò rỉ bộ nhớ
+    }
+    public void finishActivity(){
+         finish();
     }
 }

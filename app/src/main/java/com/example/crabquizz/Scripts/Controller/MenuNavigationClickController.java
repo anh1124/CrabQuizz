@@ -15,6 +15,7 @@ import com.example.crabquizz.ProfileFragment;
 import com.example.crabquizz.QuestionFragment;
 import com.example.crabquizz.SearchFragment;
 import com.example.crabquizz.R;
+import com.example.crabquizz.StudentQuestionViewFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
@@ -121,7 +122,7 @@ public class MenuNavigationClickController {
         switch (itemId) {
             case R.id.home: return new HomeFragment();
             case R.id.search: return new SearchFragment();
-            case R.id.myclass: return new ScreenStudentClassFragment();
+            case R.id.myclass: return new StudentQuestionViewFragment();
             case R.id.profile: return new ProfileFragment();
             default: return null;
         }
