@@ -3,6 +3,7 @@ package com.example.crabquizz.Scripts.Models;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class StudentClass {
     private String id;  // Change to String instead of int/double
     private String name;

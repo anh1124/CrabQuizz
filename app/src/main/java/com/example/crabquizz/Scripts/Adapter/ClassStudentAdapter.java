@@ -1,6 +1,7 @@
 package com.example.crabquizz.Scripts.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.example.crabquizz.Scripts.Controller.SessionManager;
 import com.example.crabquizz.Scripts.Controller.StudentClassController;
 import com.example.crabquizz.Scripts.Models.StudentClass;
 import com.example.crabquizz.Scripts.Models.DbContext;
+import com.example.crabquizz.StudentExamResultsActivity;
 
 import java.util.List;
 
@@ -99,8 +101,14 @@ public class ClassStudentAdapter extends RecyclerView.Adapter<ClassStudentAdapte
     }
 
     private void viewGrades(Context context, StudentClass studentClass) {
-        // Logic for viewing grades (could fetch grades from database and display them)
-        Toast.makeText(context, "Đang xem điểm của bạn trong lớp " + studentClass.getName(), Toast.LENGTH_SHORT).show();
+        int studentId = SessionManager.getInstance(context).getUserSession().getUser().getId(); // Student ID
+        String classId = studentClass.getId(); // Class ID
+
+        // Create an Intent to launch the StudentExamResultsActivity
+        Intent intent = new Intent(context, StudentExamResultsActivity.class);
+        intent.putExtra(StudentExamResultsActivity.EXTRA_STUDENT_ID, studentId);
+        intent.putExtra(StudentExamResultsActivity.EXTRA_CLASS_ID, classId);
+        context.startActivity(intent);
     }
 
     private void takeExam(Context context, StudentClass studentClass) {

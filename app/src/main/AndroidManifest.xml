@@ -15,10 +15,10 @@
         android:theme="@style/Theme.CrabQuizz"
         tools:targetApi="31">
         <activity
-            android:name=".QuizActivity"
+            android:name=".ClassScoresActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity2"
+            android:name=".StudentExamResultsActivity"
             android:exported="false" />
         <activity
             android:name=".StorageQuestionPackActivity"
@@ -30,20 +30,9 @@
             android:name=".CreateClass"
             android:exported="false" />
         <activity
-            android:name=".ClassScreen"
-            android:exported="false" />
-        <activity
-            android:name=".SearchScreen"
-            android:exported="false" />
-        <activity
-            android:name=".ProfileScreen"
-            android:exported="false" />
-        <activity
-            android:name=".QuestionScreen"
-            android:exported="false" />
-        <activity
-            android:name=".QuestionCreateScreen"
-            android:exported="false" />
+            android:name=".QuestionCreateFragment"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -53,7 +42,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity> <!-- Các Activity khác -->
-        <activity android:name=".HomeScreen" />
+        <activity
+            android:name=".StudentExamResultsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomeFragment"
+            tools:ignore="Instantiatable" />
         <activity android:name=".Login" />
         <activity android:name=".Register" />
     </application>

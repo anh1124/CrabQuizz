@@ -2,6 +2,7 @@ package com.example.crabquizz.Scripts.Controller;
 import android.util.Log;
 import android.view.Menu;
 
+import java.util.Random; // Thêm dòng này ở đầu file
 import com.example.crabquizz.Scripts.Models.StudentClass;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.google.android.gms.tasks.Task;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 public class StudentClassController {
     private static final String TAG = "StudentClassController";
@@ -232,6 +234,7 @@ public class StudentClassController {
                     return null; // Trả về null nếu không tìm thấy
                 });
     }
+
     public void checkAndCreateClass(int teacherId, String className, CreateClassCallback callback) {
         // Create a map of the class data
         Map<String, Object> classData = new HashMap<>();

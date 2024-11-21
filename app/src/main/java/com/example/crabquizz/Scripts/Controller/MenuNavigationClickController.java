@@ -122,7 +122,7 @@ public class MenuNavigationClickController {
         switch (itemId) {
             case R.id.home: return new HomeFragment();
             case R.id.search: return new SearchFragment();
-            case R.id.myclass: return new StudentQuestionViewFragment();
+            case R.id.myclass: return new ScreenStudentClassFragment();
             case R.id.profile: return new ProfileFragment();
             default: return null;
         }

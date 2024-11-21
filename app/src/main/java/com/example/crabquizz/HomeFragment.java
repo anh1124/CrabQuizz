@@ -107,7 +107,7 @@ public class HomeFragment extends Fragment {
 
         if (btnLoginSignup != null) {
             btnLoginSignup.setOnClickListener(v -> {
-                Intent intent = new Intent(requireActivity(), Register.class);
+                Intent intent = new Intent(requireActivity(), Login.class);
                 startActivity(intent);
             });
         }
