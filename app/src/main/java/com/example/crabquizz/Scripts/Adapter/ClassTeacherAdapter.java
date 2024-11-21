@@ -16,12 +16,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.crabquizz.ClassScoresActivity;
 import com.example.crabquizz.R;
 import com.example.crabquizz.Scripts.Controller.StudentClassController;
 import com.example.crabquizz.Scripts.Models.QuestionPack;
 import com.example.crabquizz.Scripts.Models.StudentClass;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.StorageQuestionPackActivity;
+
+//import com.example.crabquizz.ClassScoresActivity;
 
 import java.util.List;
 
@@ -92,8 +95,8 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
 
 
     private void stopExam(Context context, StudentClass studentClass) {
-        // Cập nhật questionPackIdNowForExam về "0"
-        studentClass.setquestionPackIdNowForExam("0");
+        // Cập nhật questionPackIdNowForExam về ""
+        studentClass.setquestionPackIdNowForExam("");
 
         // Cập nhật lên Firestore database
         dbContext.update(dbContext.CLASSES_COLLECTION, studentClass.getId(), studentClass)
@@ -115,7 +118,6 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
                     notifyDataSetChanged();
                 });
     }
-
 
     // Sửa lại phương thức onBindViewHolder để truyền holder vào addExam
     @Override
@@ -177,6 +179,9 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
                         Toast.makeText(context, "chỗ này truyền đến view add chọn exam của lò thiện ", Toast.LENGTH_SHORT).show();
                     }
                     return true;
+                case R.id.menu_view_class_scores:
+                    viewClassScores(context, studentClass);
+                    return true;
 
                 case R.id.menu_stop_now_exam:
                     if (hasExam) {
@@ -199,7 +204,16 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
                 .setNegativeButton("Hủy", null)
                 .show();
     }
+    private void viewClassScores(Context context, StudentClass studentClass) {
+        // Create an intent to launch the ClassScoresActivity
+        Intent intent = new Intent(context, ClassScoresActivity.class);
 
+        // Pass the class ID to the activity so it can fetch the scores
+        intent.putExtra("CLASS_ID", studentClass.getId());
+        intent.putExtra("CLASS_NAME", studentClass.getName());
+
+        context.startActivity(intent);
+    }
     private void deleteClass(Context context, StudentClass studentClass) {
         // Xóa lớp từ Firestore sử dụng DbContext
         dbContext.delete(dbContext.CLASSES_COLLECTION, studentClass.getId())

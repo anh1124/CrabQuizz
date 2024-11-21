@@ -64,6 +64,6 @@ public class StudentQuestionViewFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_student_question_view, container, false);
     }
     public void Initilaze(){
-        questionViewRecycler =
+       // questionViewRecycler =
     }
 }

@@ -8,7 +8,7 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_view_grades"
-        android:title="menu_view_grades"
+        android:title="xem kết quả thi"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_take_exam"
