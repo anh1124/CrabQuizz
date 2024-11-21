@@ -113,12 +113,6 @@ public class QuestionFragment extends Fragment implements QuestionPackAdapter.On
 
     @Override
     public void onQuestionPackClick(QuestionPack questionPack) {
-        // Navigate to quiz or question detail fragment
-        QuizFragment quizFragment = new QuizFragment();
-        Bundle args = new Bundle();
-        args.putString("packId", questionPack.getId());
-        quizFragment.setArguments(args);
-        navigationController.navigateTo(quizFragment);
     }
     public void Transiton(){
         buttonStore.setOnClickListener(new View.OnClickListener() {

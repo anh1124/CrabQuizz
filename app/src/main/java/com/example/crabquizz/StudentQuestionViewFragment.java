@@ -1,69 +1,72 @@
 package com.example.crabquizz;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link StudentQuestionViewFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class StudentQuestionViewFragment extends Fragment {
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import com.example.crabquizz.Scripts.Adapter.QuestionPackAdapter;
+import com.example.crabquizz.Scripts.Controller.NavigationController;
+import com.example.crabquizz.Scripts.Models.DbContext;
+import com.example.crabquizz.Scripts.Models.QuestionPack;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class StudentQuestionViewFragment extends Fragment implements QuestionPackAdapter.OnQuestionPackClickListener {
     private RecyclerView questionViewRecycler;
+    private QuestionPackAdapter adapter;
+    private List<QuestionPack> questionPacks;
+    private DbContext dbContext;
+    private NavigationController navigationController;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_student_question_view, container, false);
 
-    public StudentQuestionViewFragment() {
-        // Required empty public constructor
+        questionViewRecycler = view.findViewById(R.id.questionsViewRecycler);
+        dbContext = DbContext.getInstance();
+        questionPacks = new ArrayList<>();
+        navigationController = new NavigationController(requireActivity());
+
+        setUpRecycler();
+        loadQuestionPacks();
+
+        return view;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment StudentQuestionViewFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static StudentQuestionViewFragment newInstance(String param1, String param2) {
-        StudentQuestionViewFragment fragment = new StudentQuestionViewFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    private void setUpRecycler() {
+        adapter = new QuestionPackAdapter(questionPacks, this);
+        questionViewRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        questionViewRecycler.setAdapter(adapter);
+    }
+
+    private void loadQuestionPacks() {
+        dbContext.getAll("questionpacks")
+                .addOnSuccessListener(querySnapshots -> {
+                    questionPacks.clear();
+                    List<QuestionPack> packs = dbContext.convertToList(querySnapshots, QuestionPack.class);
+                    questionPacks.addAll(packs);
+                    adapter.updateData(questionPacks);
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Lỗi khi tải bộ câu hỏi", Toast.LENGTH_SHORT).show()
+                );
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public void onQuestionPackClick(QuestionPack questionPack) {
+        // Chuyển packId qua Intent
+        Intent intent = new Intent(getContext(), QuizActivity.class);
+        intent.putExtra("packId", questionPack.getId());  // Truyền packId vào Intent
+        intent.putExtra("packQuestionJson", questionPack.getQuestionJson());
+        startActivity(intent);  // Mở QuizActivity
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_student_question_view, container, false);
-    }
-    public void Initilaze(){
-        questionViewRecycler =
-    }
 }
