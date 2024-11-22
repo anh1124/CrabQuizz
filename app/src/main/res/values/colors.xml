@@ -29,4 +29,11 @@
     <color name="blue">#0000FF</color>
     <color name="green">#00FF00</color>
     <color name="gray">#808080</color>
+
+    <color name="selectedOptionColor">#2196F3</color>
+    <color name="selectedOptionBackground">#E3F2FD</color>
+    <color name="selectedOptionText">#000000</color>
+    <color name="defaultStrokeColor">#CCCCCC</color>
+    <color name="defaultOptionBackground">#FFFFFF</color>
+    <color name="defaultOptionText">#000000</color>
 </resources>

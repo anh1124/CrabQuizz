@@ -8,8 +8,8 @@ public class ExamResult {
     // Inner class to represent a student's score
     public static class StudentScore {
         private int studentId; // ID của học sinh
-        private Date dateDo; // Ngày thi
-        private double score; // Điểm số của học sinh
+        private String dateDo; // Ngày thi
+        private int score; // Điểm số của học sinh
         private String questionPackId;
         private String correctAnswersCount;
         private String examTime;
@@ -17,7 +17,7 @@ public class ExamResult {
         // Constructors
         public StudentScore() {}
 
-        public StudentScore(int studentId, Date dateDo, double score,
+        public StudentScore(int studentId, String dateDo, int score,
                             String questionPackId, String correctAnswersCount, String examTime) {
             this.studentId = studentId;
             this.dateDo = dateDo;
@@ -32,7 +32,7 @@ public class ExamResult {
             return studentId;
         }
 
-        public Date getDateDo() {
+        public String getDateDo() {
             return dateDo;
         }
 
@@ -57,11 +57,11 @@ public class ExamResult {
             this.studentId = studentId;
         }
 
-        public void setDateDo(Date dateDo) {
+        public void setDateDo(String dateDo) {
             this.dateDo = dateDo;
         }
 
-        public void setScore(double score) {
+        public void setScore(int score) {
             this.score = score;
         }
 

@@ -178,5 +178,40 @@ public class ExamResultController {
                 });
     }
 
+    public Task<Void> addStudentScore(String classId, ExamResult.StudentScore newScore) {
+        return DbContext.getInstance().query(EXAM_RESULTS_COLLECTION, "classId", classId)
+                .continueWithTask(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+
+                        if (!querySnapshot.isEmpty()) {
+                            // Lấy tài liệu đầu tiên trùng `classId`
+                            DocumentSnapshot existingDoc = querySnapshot.getDocuments().get(0);
+                            String documentId = existingDoc.getId();
+                            ExamResult examResult = existingDoc.toObject(ExamResult.class);
+
+                            if (examResult != null) {
+                                // Thêm điểm mới vào danh sách điểm
+                                examResult.addScore(newScore);
+
+                                // Cập nhật lại tài liệu trong Firestore
+                                return DbContext.getInstance().update(EXAM_RESULTS_COLLECTION, documentId, examResult);
+                            } else {
+                                throw new Exception("Không thể tải dữ liệu lớp học.");
+                            }
+                        } else {
+                            // Nếu không tìm thấy tài liệu, tạo tài liệu mới
+                            ExamResult newExamResult = new ExamResult();
+                            newExamResult.setClassId(classId);
+                            newExamResult.addScore(newScore);
+
+                            // Thêm tài liệu mới vào Firestore
+                            return DbContext.getInstance().add(EXAM_RESULTS_COLLECTION, newExamResult);
+                        }
+                    } else {
+                        throw task.getException();
+                    }
+                });
+    }
 
 }

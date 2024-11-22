@@ -8,6 +8,7 @@ public class Question {
     private String answer3;
     private String answer4;
     private int correctAnswer; // 1-A, 2-B, 3-C, 4-D
+    private int selectedOption = -1;
 
     public Question() {
     }
@@ -87,5 +88,13 @@ public class Question {
 
     public void setCorrectAnswer(int correctAnswer) {
         this.correctAnswer = correctAnswer;
+    }
+    public int getSelectedOption() {
+        return selectedOption;
+    }
+
+    // Setter for selected option
+    public void setSelectedOption(int selectedOption) {
+        this.selectedOption = selectedOption;
     }
 }

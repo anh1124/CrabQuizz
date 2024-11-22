@@ -15,6 +15,9 @@
         android:theme="@style/Theme.CrabQuizz"
         tools:targetApi="31">
         <activity
+            android:name=".ExamResultActivity"
+            android:exported="false" />
+        <activity
             android:name=".ClassScoresActivity"
             android:exported="false" />
         <activity
@@ -22,6 +25,12 @@
             android:exported="false" />
         <activity
             android:name=".StorageQuestionPackActivity"
+            android:exported="false" />
+        <activity
+            android:name=".QuizActivity"
+            android:exported="false" />
+        <activity
+            android:name=".StudentQuestionViewFragment"
             android:exported="false" />
         <activity
             android:name=".JoinAndInfoClass"

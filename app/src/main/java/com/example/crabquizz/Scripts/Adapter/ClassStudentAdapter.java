@@ -113,6 +113,7 @@ public class ClassStudentAdapter extends RecyclerView.Adapter<ClassStudentAdapte
 
     private void takeExam(Context context, StudentClass studentClass) {
         // Logic for taking the exam (could navigate to an exam screen or fetch exam details)
+        studentClass.getId();//truyeefn cais nay vao MainActivity2
         Toast.makeText(context, "Bắt đầu làm bài kiểm tra của lớp " + studentClass.getName(), Toast.LENGTH_SHORT).show();
     }
 

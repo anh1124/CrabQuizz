@@ -66,6 +66,7 @@ public class StudentQuestionViewFragment extends Fragment implements QuestionPac
         Intent intent = new Intent(getContext(), QuizActivity.class);
         intent.putExtra("packId", questionPack.getId());  // Truyền packId vào Intent
         intent.putExtra("packQuestionJson", questionPack.getQuestionJson());
+        intent.putExtra("packTitle", questionPack.getTitle());
         startActivity(intent);  // Mở QuizActivity
     }
 
