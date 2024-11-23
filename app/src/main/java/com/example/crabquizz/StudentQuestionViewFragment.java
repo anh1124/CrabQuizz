@@ -1,6 +1,5 @@
 package com.example.crabquizz;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,12 +61,18 @@ public class StudentQuestionViewFragment extends Fragment implements QuestionPac
 
     @Override
     public void onQuestionPackClick(QuestionPack questionPack) {
-        // Chuyển packId qua Intent
-        Intent intent = new Intent(getContext(), QuizActivity.class);
-        intent.putExtra("packId", questionPack.getId());  // Truyền packId vào Intent
-        intent.putExtra("packQuestionJson", questionPack.getQuestionJson());
-        intent.putExtra("packTitle", questionPack.getTitle());
-        startActivity(intent);  // Mở QuizActivity
+        // Lấy thông tin cần thiết từ questionPack
+        String questionId = questionPack.getId(); // Giả sử có phương thức getQuestionId() trong QuestionPack
+        String questionText = questionPack.getTitle(); // Giả sử có phương thức getQuestionText() trong QuestionPack
+
+        // Tạo một instance mới của DetailsQuestionFragment
+        DetailsQuestionFragment detailsQuestionFragment = DetailsQuestionFragment.newInstance(questionId, questionText);
+
+        // Chuyển đến fragment DetailsQuestionFragment
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, detailsQuestionFragment) // Đảm bảo R.id.fragment_container là ID của container chứa các fragment
+                .addToBackStack(null) // Cho phép quay lại fragment trước đó
+                .commit();
     }
 
 }

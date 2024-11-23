@@ -59,6 +59,8 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
 
         initializeComponents();
         setupQuizFlow();
+
+        Log.d("shadhsjdsa", "size = " + questions.size());
     }
 
     private void initializeComponents() {
@@ -103,6 +105,8 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
             Toast.makeText(this, "No questions in this pack", Toast.LENGTH_SHORT).show();
             finish();
         }
+        Log.d("QuizActivityyy", "Current questions size: " + questions.size());
+
     }
 
     private void startTimer() {
@@ -158,7 +162,8 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
     private void updateQuestionDisplay() {
         List<Question> currentQuestion = new ArrayList<>();
         currentQuestion.add(questions.get(currentQuestionIndex));
-        adapter.updateQuestions(currentQuestion);
+        // Truyền thêm thông tin về tổng số câu hỏi gốc
+        adapter.updateCurrentQuestions(currentQuestion, questions.size(), currentQuestionIndex);
         recyclerViewQuestions.scrollToPosition(0);
     }
 

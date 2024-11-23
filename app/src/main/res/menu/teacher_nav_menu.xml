@@ -10,7 +10,7 @@
 <!--        android:icon="@drawable/ic_search"-->
 <!--        android:title="Lớp học" />-->
     <item
-        android:id="@+id/myclass"
+        android:id="@+id/teacherclass"
         android:icon="@drawable/ic_class"
         android:title="Lớp học" />
 

@@ -1,6 +1,7 @@
 package com.example.crabquizz.Scripts.Adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ public class QuestionPackForJoinAdapter extends RecyclerView.Adapter<QuestionPac
     private List<Question> questions;
     private final OnQuestionPackClickListener listener;
     private int selectedOptionIndex = -1;
+    private int totalQuestions = 0;
+    private int currentQuestionIndex = 0;
 
     public interface OnQuestionPackClickListener {
         void onOptionSelected(int position);
@@ -39,8 +42,9 @@ public class QuestionPackForJoinAdapter extends RecyclerView.Adapter<QuestionPac
     @Override
     public void onBindViewHolder(@NonNull QuestionPackForJoinViewHolder holder, int position) {
         if (questions != null && position < questions.size()) {
-            holder.bind(questions.get(position), selectedOptionIndex, position, questions.size());
+            holder.bind(questions.get(position), selectedOptionIndex, currentQuestionIndex, totalQuestions);
         }
+        Log.d("shadhsjdsa", "size = " + questions.size());
     }
 
     @Override
@@ -50,6 +54,14 @@ public class QuestionPackForJoinAdapter extends RecyclerView.Adapter<QuestionPac
 
     public void updateQuestions(List<Question> newQuestions) {
         this.questions = newQuestions;
+        this.selectedOptionIndex = -1;
+        notifyDataSetChanged();
+    }
+
+    public void updateCurrentQuestions(List<Question> newQuestions, int totalQuestions, int currentIndex) {
+        this.questions = newQuestions;
+        this.totalQuestions = totalQuestions;
+        this.currentQuestionIndex = currentIndex;
         this.selectedOptionIndex = -1;
         notifyDataSetChanged();
     }
@@ -95,9 +107,12 @@ public class QuestionPackForJoinAdapter extends RecyclerView.Adapter<QuestionPac
             tvOption2.setText(question.getAnswer2());
             tvOption3.setText(question.getAnswer3());
             tvOption4.setText(question.getAnswer4());
+
             tvStepProgress.setText(String.format(" %d of %d", currentIndex + 1, totalQuestions));
+
             progressBar.setProgress((int) (((float) (currentIndex + 1) / totalQuestions) * 100));
             resetCardColors();
+
             highlightSelectedOption(selectedOptionIndex);
         }
 

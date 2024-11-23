@@ -6,12 +6,12 @@
         android:title="Trang chủ" />
 
     <item
-        android:id="@+id/search"
-        android:icon="@drawable/ic_search"
-        android:title="Tìm kiếm" />
+        android:id="@+id/question"
+        android:icon="@drawable/ic_question"
+        android:title="Câu hỏi" />
 
     <item
-        android:id="@+id/myclass"
+        android:id="@+id/studentclass"
         android:icon="@drawable/ic_people"
         android:title="Lớp học" />
 
