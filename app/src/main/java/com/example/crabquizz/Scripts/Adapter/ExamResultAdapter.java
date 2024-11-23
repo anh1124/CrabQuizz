@@ -11,11 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.crabquizz.R;
 import com.example.crabquizz.Scripts.Models.ExamResult;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
-public class ExamResultAdapter extends RecyclerView.Adapter<ExamResultAdapter.ExamResultViewHolder> {
+public class ExamResultAdapter extends RecyclerView.Adapter<ExamResultAdapter.ViewHolder> {
     private List<ExamResult.StudentScore> examResults;
 
     public ExamResultAdapter(List<ExamResult.StudentScore> examResults) {
@@ -24,41 +22,36 @@ public class ExamResultAdapter extends RecyclerView.Adapter<ExamResultAdapter.Ex
 
     @NonNull
     @Override
-    public ExamResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_exam_result, parent, false);
-        return new ExamResultViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ExamResultViewHolder holder, int position) {
-        ExamResult.StudentScore result = examResults.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        ExamResult.StudentScore score = examResults.get(position);
 
-        // Format date
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
-        holder.tvQuestionPack.setText("Bộ câu hỏi: " + result.getQuestionPackId());
-        holder.tvScore.setText(String.format("Điểm: %.2f", result.getScore()));
-        holder.tvExamDate.setText("Ngày thi: " + dateFormat.format(result.getDateDo()));
-        holder.tvExamTime.setText("Thời gian: " + result.getExamTime());
-        holder.tvCorrectAnswers.setText("Số câu đúng: " + result.getCorrectAnswersCount());
+        holder.tvDate.setText("Ngày thi: " + score.getDateDo());
+        holder.tvScore.setText(String.format("Điểm: %.1f", score.getScore()));
+        holder.tvCorrectAnswers.setText("Số câu đúng: " + score.getCorrectAnswersCount());
+        holder.tvExamTime.setText("Thời gian làm bài: " + score.getExamTime());
     }
 
     @Override
     public int getItemCount() {
-        return examResults.size();
+        return examResults != null ? examResults.size() : 0;
     }
 
-    static class ExamResultViewHolder extends RecyclerView.ViewHolder {
-        TextView tvQuestionPack, tvScore, tvExamDate, tvExamTime, tvCorrectAnswers;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvDate, tvScore, tvCorrectAnswers, tvExamTime;
 
-        public ExamResultViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvQuestionPack = itemView.findViewById(R.id.tvQuestionPack);
+            tvDate = itemView.findViewById(R.id.tvDate);
             tvScore = itemView.findViewById(R.id.tvScore);
-            tvExamDate = itemView.findViewById(R.id.tvExamDate);
-            tvExamTime = itemView.findViewById(R.id.tvExamTime);
             tvCorrectAnswers = itemView.findViewById(R.id.tvCorrectAnswers);
+            tvExamTime = itemView.findViewById(R.id.tvExamTime);
         }
     }
 }

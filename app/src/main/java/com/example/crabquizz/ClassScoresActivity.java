@@ -1,7 +1,6 @@
 package com.example.crabquizz;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -9,27 +8,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.crabquizz.R;
 import com.example.crabquizz.Scripts.Adapter.ClassScoresAdapter;
 import com.example.crabquizz.Scripts.Controller.ExamResultController;
 import com.example.crabquizz.Scripts.Models.DbContext;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
+import com.example.crabquizz.Scripts.Models.ExamResult;
 
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-// In ClassScoresActivity.java
 public class ClassScoresActivity extends AppCompatActivity {
-    private RecyclerView recyclerViewScores;
     private TextView titleTextView;
-    private ClassScoresAdapter scoresAdapter;
-    private List<StudentScore> studentScores;
+    private TextView tvAverageScore;
+    private TextView tvTotalExams;
+    private RecyclerView recyclerViewExamResults;
+
     private ExamResultController examResultController;
-    private DbContext dbContext;
+    private ClassScoresAdapter scoresAdapter;
     private String classId;
     private String className;
 
@@ -38,13 +31,14 @@ public class ClassScoresActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_class_scores);
 
-        // Initialize controllers and context
+        // Initialize controllers
         examResultController = new ExamResultController();
-        dbContext = DbContext.getInstance();
 
         // Initialize views
-        recyclerViewScores = findViewById(R.id.recyclerViewScores);
         titleTextView = findViewById(R.id.titleTextView);
+        tvAverageScore = findViewById(R.id.tvAverageScore);
+        tvTotalExams = findViewById(R.id.tvTotalExams);
+        recyclerViewExamResults = findViewById(R.id.recyclerViewExamResults);
 
         // Get class details from intent
         classId = getIntent().getStringExtra("CLASS_ID");
@@ -53,45 +47,40 @@ public class ClassScoresActivity extends AppCompatActivity {
         // Set title
         titleTextView.setText("Điểm số lớp " + className);
 
-        // Initialize data structures
-        studentScores = new ArrayList<>();
-        scoresAdapter = new ClassScoresAdapter(studentScores);
-
         // Setup RecyclerView
-        recyclerViewScores.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewScores.setAdapter(scoresAdapter);
+        recyclerViewExamResults.setLayoutManager(new LinearLayoutManager(this));
 
         // Fetch and display scores
         fetchClassScores();
     }
 
     private void fetchClassScores() {
-        // Add a method to ExamResultController to get student scores with names
-        examResultController.getStudentScoresWithNames(classId)
-                .addOnSuccessListener(studentScoreMap -> {
-                    studentScores.clear();
-                    for (Map.Entry<String, Double> entry : studentScoreMap.entrySet()) {
-                        studentScores.add(new StudentScore(entry.getKey(), entry.getValue()));
-                    }
-                    scoresAdapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("ClassScoresActivity", "Error fetching student scores", e);
-                    Toast.makeText(this, "Lỗi khi tải điểm số", Toast.LENGTH_SHORT).show();
-                });
+        examResultController.getAllStudentScoresInClass(classId)
+                .addOnSuccessListener(this::updateUI)
+                .addOnFailureListener(e -> Toast.makeText(this,
+                        "Lỗi khi tải điểm: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show());
     }
 
-    // Inner class to represent student scores (keep this or use the one from ExamResult)
-    public static class StudentScore {
-        private String name;
-        private double score;
+    private void updateUI(List<ExamResult.StudentScore> scores) {
+        // Calculate statistics
+        if (scores != null && !scores.isEmpty()) {
+            double totalScore = 0;
+            for (ExamResult.StudentScore score : scores) {
+                totalScore += score.getScore();
+            }
+            double averageScore = totalScore / scores.size();
 
-        public StudentScore(String name, double score) {
-            this.name = name;
-            this.score = score;
+            // Update UI
+            tvAverageScore.setText(String.format("Điểm trung bình: %.1f", averageScore));
+            tvTotalExams.setText("Tổng số bài thi: " + scores.size());
+
+            // Setup adapter
+            scoresAdapter = new ClassScoresAdapter(scores);
+            recyclerViewExamResults.setAdapter(scoresAdapter);
+        } else {
+            tvAverageScore.setText("Chưa có điểm");
+            tvTotalExams.setText("Tổng số bài thi: 0");
         }
-
-        public String getName() { return name; }
-        public double getScore() { return score; }
     }
 }
