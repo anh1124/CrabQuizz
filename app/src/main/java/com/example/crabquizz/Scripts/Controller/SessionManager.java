@@ -139,17 +139,24 @@ public class SessionManager {
     //=========================================================================
     //lưu thông tin cơ bản của người hiện tại vừa đăng nhập
     public void SaveLoginSession(String username, String fullname, String token, String userRole, boolean autoLogin) {
+        Log.d("SessionManager", "Saving login session - Username: " + username + ", AutoLogin: " + autoLogin);
         editor.putString(KEY_USERNAME, username);
         editor.putString(KEY_FULLNAME, fullname);
         editor.putString(KEY_TOKEN, token);
         editor.putString(KEY_USER_ROLE, userRole);
         setAutoLoginEnabled(autoLogin);
-        editor.commit();
+        editor.commit();  // Đảm bảo dùng commit() thay vì apply()
+
+        // Verify saved data
+        Log.d("SessionManager", "Verified saved data - Username: " +
+                sharedPreferences.getString(KEY_USERNAME, "not saved") +
+                ", AutoLogin: " + sharedPreferences.getBoolean(KEY_AUTO_LOGIN, false));
     }
     /**
      * Đăng xuất người dùng và xóa toàn bộ dữ liệu đã lưu trong sharedPreferences
      */
     public void logoutUser() {
+        Log.d("SessionManager", "Logging out user - clearing all data");
         editor.clear();
         editor.commit();
         clearTEMPUserAndsharedPreferencesSession();
@@ -226,14 +233,20 @@ public class SessionManager {
         // Note: No SharedPreferences storage for guest session, only temporary in-memory storage
     }
     public UserTEMPSession getUserSession() {
-        if (userTEMPSession.user == null) {
+        if (userTEMPSession == null) {
+            userTEMPSession = new UserTEMPSession();
+        }
+
+        if (userTEMPSession.getUser() == null) {
             String userSessionData = sharedPreferences.getString(KEY_USER_SESSION, null);
             if (userSessionData != null) {
-                Gson gson = new Gson();
-                User user = gson.fromJson(userSessionData, User.class);
-
-                userTEMPSession = new UserTEMPSession();
-                userTEMPSession.setUser(user);
+                try {
+                    Gson gson = new Gson();
+                    User user = gson.fromJson(userSessionData, User.class);
+                    userTEMPSession.setUser(user);
+                } catch (Exception e) {
+                    Log.e("SessionManager", "Error parsing user session data", e);
+                }
             }
         }
         return userTEMPSession;

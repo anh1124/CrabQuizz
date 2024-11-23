@@ -1,6 +1,7 @@
 package com.example.crabquizz;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,10 +38,13 @@ public class StudentExamResultsActivity extends AppCompatActivity {
         // Ánh xạ view
         recyclerViewExamResults = findViewById(R.id.recyclerViewExamResults);
 
-
         // Lấy dữ liệu từ Intent
         int studentId = getIntent().getIntExtra(EXTRA_STUDENT_ID, -1);
         String classId = getIntent().getStringExtra(EXTRA_CLASS_ID);
+
+        // Ghi log thông tin truyền vào
+        Log.d("StudentExamResults12", "Received studentId: " + studentId);
+        Log.d("StudentExamResults12", "Received classId: " + classId);
 
         // Kiểm tra dữ liệu
         if (studentId == -1 || classId == null) {
@@ -52,19 +56,46 @@ public class StudentExamResultsActivity extends AppCompatActivity {
         // Khởi tạo controller
         examResultController = new ExamResultController();
 
-        // Lấy kết quả thi
-        examResultController.getStudentExamResults(studentId, classId)
+        // Lấy kết quả thi từ controller
+        examResultController.getStudentScoresInClass(studentId, classId)
                 .addOnSuccessListener(this::setupExamResults)
                 .addOnFailureListener(this::handleError);
     }
 
     private void setupExamResults(List<ExamResult.StudentScore> examResults) {
-        // Thiết lập RecyclerView
-        examResultAdapter = new ExamResultAdapter(examResults);
-        recyclerViewExamResults.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewExamResults.setAdapter(examResultAdapter);
-    }
+        // Ghi log danh sách điểm
+        for (ExamResult.StudentScore score : examResults) {
+            Log.d("StudentExamResults12", "StudentScore: " +
+                    "classId=" + score.getClassId() +
+                    ", studentId=" + score.getStudentId() +
+                    ", dateDo=" + score.getDateDo() +
+                    ", score=" + score.getScore() +
+                    ", questionPackId=" + score.getQuestionPackId() +
+                    ", correctAnswersCount=" + score.getCorrectAnswersCount() +
+                    ", examTime=" + score.getExamTime());
+        }
 
+        // Thiết lập RecyclerView
+        recyclerViewExamResults.setLayoutManager(new LinearLayoutManager(this));
+        examResultAdapter = new ExamResultAdapter(examResults);
+        recyclerViewExamResults.setAdapter(examResultAdapter);
+
+        // Tính và hiển thị điểm trung bình và tổng số bài thi (nếu cần)
+        if (examResults != null && !examResults.isEmpty()) {
+            double totalScore = 0;
+            for (ExamResult.StudentScore score : examResults) {
+                totalScore += score.getScore();
+            }
+            double averageScore = totalScore / examResults.size();
+
+            if (tvAverageScore != null) {
+                tvAverageScore.setText(String.format("Điểm trung bình: %.1f", averageScore));
+            }
+            if (tvTotalExams != null) {
+                tvTotalExams.setText("Tổng số bài thi: " + examResults.size());
+            }
+        }
+    }
     private void handleError(Exception e) {
         Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
     }

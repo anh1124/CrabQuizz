@@ -95,8 +95,8 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
 
 
     private void stopExam(Context context, StudentClass studentClass) {
-        // Cập nhật questionPackIdNowForExam về ""
-        studentClass.setquestionPackIdNowForExam("0");
+        // Cập nhật questionPackIdNowForExam thành chuỗi trống
+        studentClass.setquestionPackIdNowForExam("");
 
         // Cập nhật lên Firestore database
         dbContext.update(dbContext.CLASSES_COLLECTION, studentClass.getId(), studentClass)
@@ -161,7 +161,7 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
         popupMenu.inflate(R.menu.teacher_class_item_menu);
 
         // Kiểm tra trạng thái để hiển thị hoặc ẩn các mục menu
-        boolean hasExam = !"0".equals(questionPackId);
+        boolean hasExam = questionPackId != null && !questionPackId.isEmpty() && !"".equals(questionPackId);
         popupMenu.getMenu().findItem(R.id.menu_add_exam).setVisible(!hasExam);
         popupMenu.getMenu().findItem(R.id.menu_stop_now_exam).setVisible(hasExam);
 

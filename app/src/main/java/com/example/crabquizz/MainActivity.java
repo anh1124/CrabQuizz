@@ -31,11 +31,10 @@ public class MainActivity extends AppCompatActivity {
         try {
             initPackage();
             initViews();
-
             GetAppSetUp();
             //CleanUserSession();
             CheckAutoAndLoginIfAble();
-
+            sessionManager.showLogUserData();
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreate: ", e);
             Toast.makeText(this, "Có lỗi xảy ra khi khởi động ứng dụng", Toast.LENGTH_SHORT).show();
@@ -55,20 +54,27 @@ public class MainActivity extends AppCompatActivity {
     private void CheckAutoAndLoginIfAble() {
         try {
             if (sessionManager != null) {
-                // Kiểm tra xem đã có user session chưa
-                if (sessionManager.getUserSession() != null &&
-                        sessionManager.getUserSession().getUser() != null) {
-                    // Nếu đã có session, chuyển thẳng đến home
-                    navigateToHomeFragment();
-                }
-                // Nếu chưa có session nhưng có auto login
-                else if (sessionManager.isAutoLoginEnabled()) {
+                // Kiểm tra auto login trước
+                if (sessionManager.isAutoLoginEnabled() &&
+                        sessionManager.isHaveToken() &&
+                        sessionManager.isHaveUsername()) {
+
                     TryloginWithUsernameAndTokenSharedPreferences();
+                    return;
                 }
+
+                // Kiểm tra session hiện tại
+                SessionManager.UserTEMPSession currentSession = sessionManager.getUserSession();
+                if (currentSession != null &&
+                        currentSession.getUser() != null &&
+                        currentSession.getUser().getToken() != null) {
+
+                    navigateToHomeFragment();
+                    return;
+                }
+
                 // Nếu không có gì thì tạo guest
-                else {
-                    createGuestUserSession();
-                }
+                createGuestUserSession();
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in auto login check: ", e);
