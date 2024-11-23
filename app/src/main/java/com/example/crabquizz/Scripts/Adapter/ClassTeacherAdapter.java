@@ -96,7 +96,7 @@ public class ClassTeacherAdapter extends RecyclerView.Adapter<ClassTeacherAdapte
 
     private void stopExam(Context context, StudentClass studentClass) {
         // Cập nhật questionPackIdNowForExam về ""
-        studentClass.setquestionPackIdNowForExam("");
+        studentClass.setquestionPackIdNowForExam("0");
 
         // Cập nhật lên Firestore database
         dbContext.update(dbContext.CLASSES_COLLECTION, studentClass.getId(), studentClass)
