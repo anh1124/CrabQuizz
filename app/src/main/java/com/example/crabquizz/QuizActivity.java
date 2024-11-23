@@ -25,8 +25,10 @@ import com.google.gson.reflect.TypeToken;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class QuizActivity extends AppCompatActivity implements QuestionPackForJoinAdapter.OnQuestionPackClickListener {
@@ -39,6 +41,7 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
     private RecyclerView recyclerViewQuestions;
 
     private List<Question> questions = new ArrayList<>();
+    private List<QuestionAnswer> answers = new ArrayList<>();
     private QuestionPackForJoinAdapter adapter;
 
     private int currentQuestionIndex = 0;
@@ -163,16 +166,35 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
     public void onOptionSelected(int optionIndex) {
         if (currentQuestionIndex < questions.size()) {
             Question currentQuestion = questions.get(currentQuestionIndex);
+
             currentQuestion.setSelectedOption(optionIndex);
 
-            if (optionIndex == currentQuestion.getCorrectAnswer()) {
-                correctAnswersCount++;
+            QuestionAnswer questionAnswer = new QuestionAnswer(
+                    currentQuestion.getId(),
+                    optionIndex
+            );
+            dbContext.add("questionanswers", questionAnswer)
+                            .addOnSuccessListener(aVoid ->{})
+                            .addOnFailureListener(e -> {});
+            // Kiểm tra xem đã có câu trả lời cho câu hỏi này chưa
+            boolean found = false;
+            for (int i = 0; i < answers.size(); i++) {
+                if (answers.get(i).getId() == currentQuestion.getId()) {
+                    answers.set(i, questionAnswer); // Cập nhật câu trả lời nếu đã tồn tại
+                    found = true;
+                    break;
+                }
             }
+            if (!found) {
+                answers.add(questionAnswer); // Thêm mới nếu chưa có câu trả lời
+            }
+
             adapter.setSelectedOption(optionIndex);
         }
     }
 
     private void saveExamResultToDatabase() {
+        String classId = getIntent().getStringExtra("classId");
         int studentID = SessionManager.getInstance(this).getUserSession().getUser().getId();
         String packQuestionID = getIntent().getStringExtra("packId");
         int score = calculateScore();
@@ -183,6 +205,7 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
         String formattedTimeUsed = String.format("%02d:%02d", minutes, seconds);
 
         ExamResult.StudentScore studentScore = new ExamResult.StudentScore(
+                classId,
                 studentID,
                 dateDo,
                 score,
@@ -220,8 +243,26 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
     }
 
     private int calculateScore() {
+        correctAnswersCount = 0;
+
+        // Map để lưu câu trả lời cuối cùng cho mỗi câu hỏi
+        Map<Integer, Integer> finalAnswers = new HashMap<>();
+        for (QuestionAnswer answer : answers) {
+            finalAnswers.put(answer.getId(), answer.getAnswer());
+        }
+
+        // Kiểm tra từng câu hỏi
+        for (Question question : questions) {
+            Integer selectedAnswer = finalAnswers.get(question.getId());
+            if (selectedAnswer != null && selectedAnswer == question.getCorrectAnswer()) {
+                correctAnswersCount++;
+            }
+        }
+
         return Math.round((float) correctAnswersCount / questions.size() * 100);
     }
+
+
 
     @Override
     protected void onDestroy() {

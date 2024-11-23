@@ -2,6 +2,7 @@ package com.example.crabquizz.Scripts.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.crabquizz.QuizActivity;
 import com.example.crabquizz.R;
+import com.example.crabquizz.Scripts.Controller.QuestionPackController;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
 import com.example.crabquizz.Scripts.Controller.StudentClassController;
+import com.example.crabquizz.Scripts.Models.QuestionPack;
 import com.example.crabquizz.Scripts.Models.StudentClass;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.StudentExamResultsActivity;
@@ -112,13 +116,49 @@ public class ClassStudentAdapter extends RecyclerView.Adapter<ClassStudentAdapte
     }
 
     private void takeExam(Context context, StudentClass studentClass) {
-        Intent intent = new Intent(context, StudentExamResultsActivity.class);
-        String packId = studentClass.getquestionPackIdNowForExam(); // Verify this method name
+        QuestionPackController controller = new QuestionPackController();
+        String questionPackId = studentClass.getquestionPackIdNowForExam();
 
-        intent.putExtra("packId", packId);
+        Log.d("TakeExamm", "Starting takeExam with questionPackId: " + questionPackId);
 
-        context.startActivity(intent);
-        Toast.makeText(context, "Bắt đầu làm bài kiểm tra của lớp " + studentClass.getName(), Toast.LENGTH_SHORT).show();
+        controller.getQuestionPackById(questionPackId)
+                .addOnSuccessListener(questionPack -> {
+                    Log.d("TakeExamm", "getQuestionPackById success");
+                    String questionJson = questionPack.getQuestionJson();
+                    Log.d("TakeExamm", "questionJson: " +
+                            (questionJson != null ? questionJson.substring(0, Math.min(100, questionJson.length())) + "..." : "null"));
+
+                    if (questionJson != null) {
+                        Intent intent = new Intent(context, QuizActivity.class);
+                        intent.putExtra("classId", studentClass.getId());
+                        intent.putExtra("packId", questionPackId);
+                        intent.putExtra("packQuestionJson", questionJson);
+                        intent.putExtra("packTitle", studentClass.getName());
+                        // Add any additional QuestionPack data you might need
+
+                        Log.d("TakeExamm", "Starting QuizActivity with:");
+                        Log.d("TakeExamm", "packId: " + questionPackId);
+                        Log.d("TakeExamm", "packTitle: " + studentClass.getName());
+                        Log.d("TakeExamm", "packTitle: " + studentClass.getId());
+
+                        context.startActivity(intent);
+
+                        Toast.makeText(context,
+                                "Bắt đầu làm bài kiểm tra của lớp " + studentClass.getName(),
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.e("TakeExam", "questionJson is null");
+                        Toast.makeText(context,
+                                "Bài kiểm tra không có nội dung",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("TakeExamm", "Failed to get QuestionPack", e);
+                    Toast.makeText(context,
+                            "Không thể tải bài kiểm tra: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override

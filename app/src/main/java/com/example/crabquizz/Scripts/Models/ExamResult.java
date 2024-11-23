@@ -7,6 +7,7 @@ import java.util.List;
 public class ExamResult {
     // Inner class to represent a student's score
     public static class StudentScore {
+        private String classId;
         private int studentId; // ID của học sinh
         private String dateDo; // Ngày thi
         private int score; // Điểm số của học sinh
@@ -17,8 +18,9 @@ public class ExamResult {
         // Constructors
         public StudentScore() {}
 
-        public StudentScore(int studentId, String dateDo, int score,
+        public StudentScore(String classId ,int studentId, String dateDo, int score,
                             String questionPackId, String correctAnswersCount, String examTime) {
+            this.classId = classId;
             this.studentId = studentId;
             this.dateDo = dateDo;
             this.score = score;
@@ -28,6 +30,10 @@ public class ExamResult {
         }
 
         // Getters
+        public String getClassId() {
+            return classId;
+        }
+
         public int getStudentId() {
             return studentId;
         }
@@ -53,6 +59,10 @@ public class ExamResult {
         }
 
         // Setters
+        public void setClassId(String classId) {
+            this.classId = classId;
+        }
+
         public void setStudentId(int studentId) {
             this.studentId = studentId;
         }
@@ -76,6 +86,7 @@ public class ExamResult {
         public void setExamTime(String examTime) {
             this.examTime = examTime;
         }
+
     }
 
     private String id; // ID duy nhất cho bản ghi điểm
