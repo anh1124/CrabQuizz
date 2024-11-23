@@ -2,8 +2,11 @@ package com.example.crabquizz;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.Spanned;
 import android.util.Log;
-import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -15,22 +18,24 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.crabquizz.Scripts.Controller.TransitionFragemt;
+import com.google.android.material.textfield.TextInputEditText;
 import com.example.crabquizz.Scripts.Controller.UserController;
 import com.example.crabquizz.Scripts.Models.DbContext;
 import com.example.crabquizz.Scripts.Models.User;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
 
+import java.util.regex.Pattern;
+
+
 public class Login extends AppCompatActivity {
-
-
     private DbContext dbContext;
     private SessionManager sessionManager;
 
     public Button buttonBackToMainMenu, buttonlogin;
-    public EditText TextInputEditTextPassword, TextInputEditTextUserName;
+    public TextInputEditText TextInputEditTextPassword, TextInputEditTextUserName;
     public TextView textViewBtnGoRegister;
     public CheckBox checkBoxAutoLogin;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,28 +50,69 @@ public class Login extends AppCompatActivity {
 
         initViews();
         initPackage();
-
+        setupInputFields();
     }
+    private void setupInputFields() {
+        // Cấu hình cho username field
+        TextInputEditTextUserName.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD |
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        TextInputEditTextUserName.setImeOptions(EditorInfo.IME_FLAG_FORCE_ASCII);
+
+        // Cấu hình cho password field
+        TextInputEditTextPassword.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_PASSWORD |
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        TextInputEditTextPassword.setImeOptions(EditorInfo.IME_FLAG_FORCE_ASCII);
+    }
+
+    private boolean validateInputFields() {
+        boolean isValid = true;
+        String username = TextInputEditTextUserName.getText().toString().trim();
+        String password = TextInputEditTextPassword.getText().toString().trim();
+
+        // Validate Username
+        if (username.isEmpty() || username.length() < 3 || username.length() > 20) {
+            TextInputEditTextUserName.setError("User name must be between 3 and 20 characters");
+            isValid = false;
+        } else if (!username.matches("^[a-zA-Z0-9_-]*$")) {
+            TextInputEditTextUserName.setError("Username can only contain letters, numbers, underscores and hyphens");
+            isValid = false;
+        } else {
+            TextInputEditTextUserName.setError(null);
+        }
+
+        // Validate Password
+        if (password.isEmpty() || password.length() < 3 || password.length() > 20) {
+            TextInputEditTextPassword.setError("Password must be between 3 and 20 characters");
+            isValid = false;
+        } else if (!password.matches("^[a-zA-Z0-9!@#$%^&*()_\\-+=\\[\\]{}|:;<>,.?/~]*$")) {
+            TextInputEditTextPassword.setError("Password contains invalid characters");
+            isValid = false;
+        } else {
+            TextInputEditTextPassword.setError(null);
+        }
+
+        return isValid;
+    }
+
 
     private void initPackage() {
         dbContext = DbContext.getInstance();
         sessionManager = SessionManager.getInstance(this);
     }
 
+
     private void initViews() {
         buttonBackToMainMenu = findViewById(R.id.buttonbacktomainmenu);
-        buttonlogin =findViewById(R.id.buttonlogin);
-        TextInputEditTextPassword =findViewById(R.id.TextInputEditTextPassword);
-        TextInputEditTextUserName =findViewById(R.id.TextInputEditTextUserName);
+        buttonlogin = findViewById(R.id.buttonlogin);
+        TextInputEditTextPassword = findViewById(R.id.TextInputEditTextPassword);
+        TextInputEditTextUserName = findViewById(R.id.TextInputEditTextUserName);
         textViewBtnGoRegister = findViewById(R.id.textViewBtnGoLogin);
         checkBoxAutoLogin = findViewById(R.id.checkBoxAutoLogin);
 
-        buttonBackToMainMenu.setOnClickListener(v -> {
-            GoHomeActive();
-        });
-        buttonlogin.setOnClickListener(v -> {
-            DoLoginAction();
-        });
+        buttonBackToMainMenu.setOnClickListener(v -> GoHomeActive());
+        buttonlogin.setOnClickListener(v -> DoLoginAction());
         textViewBtnGoRegister.setOnClickListener(v -> {
             Intent intent = new Intent(Login.this, Register.class);
             startActivity(intent);
@@ -102,32 +148,6 @@ public class Login extends AppCompatActivity {
         }
     }
 
-    private boolean validateInputFields() {
-        boolean isValid = true;
-
-        String username = TextInputEditTextUserName.getText().toString().trim();
-        String password = TextInputEditTextPassword.getText().toString().trim();
-
-
-
-        // Validate UserName
-        if (username.isEmpty() || username.length() < 3 || username.length() > 20) {
-            TextInputEditTextUserName.setError("User name must be between 3 and 20 characters");
-            isValid = false;
-        } else {
-            TextInputEditTextUserName.setError(null);
-        }
-
-        // Validate Password
-        if (password.isEmpty() || password.length() < 3 || password.length() > 20) {
-            TextInputEditTextPassword.setError("Password must be between 3 and 20 characters");
-            isValid = false;
-        } else {
-            TextInputEditTextPassword.setError(null);
-        }
-
-        return isValid;
-    }
 
     public void CallWhenLoginSuccess() {
         //tạo 1 cái currentUser

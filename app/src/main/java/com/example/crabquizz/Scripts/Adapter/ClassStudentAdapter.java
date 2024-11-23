@@ -13,8 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.crabquizz.MainActivity2;
-import com.example.crabquizz.QuizActivity;
 import com.example.crabquizz.R;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
 import com.example.crabquizz.Scripts.Controller.StudentClassController;
