@@ -4,20 +4,19 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.crabquizz.R;
 import com.example.crabquizz.Scripts.Models.Question;
 import com.google.android.material.card.MaterialCardView;
-
 import java.util.List;
 
 public class QuestionPackForJoinAdapter extends RecyclerView.Adapter<QuestionPackForJoinAdapter.QuestionPackForJoinViewHolder> {
     private List<Question> questions;
-    private OnQuestionPackClickListener listener;
+    private final OnQuestionPackClickListener listener;
     private int selectedOptionIndex = -1;
 
     public interface OnQuestionPackClickListener {
@@ -39,9 +38,8 @@ public class QuestionPackForJoinAdapter extends RecyclerView.Adapter<QuestionPac
 
     @Override
     public void onBindViewHolder(@NonNull QuestionPackForJoinViewHolder holder, int position) {
-        if (questions != null && !questions.isEmpty() && position >= 0 && position < questions.size()) {
-            Question currentQuestion = questions.get(position);
-            holder.bind(currentQuestion, selectedOptionIndex, position, questions.size());
+        if (questions != null && position < questions.size()) {
+            holder.bind(questions.get(position), selectedOptionIndex, position, questions.size());
         }
     }
 
@@ -62,51 +60,33 @@ public class QuestionPackForJoinAdapter extends RecyclerView.Adapter<QuestionPac
     }
 
     static class QuestionPackForJoinViewHolder extends RecyclerView.ViewHolder {
-        TextView tvQuestion, tvOption1, tvOption2, tvOption3, tvOption4, tvStepProgress;
-        MaterialCardView option1Card, option2Card, option3Card, option4Card;
-        OnQuestionPackClickListener listener;
+        private final TextView tvQuestion, tvOption1, tvOption2, tvOption3, tvOption4, tvStepProgress;
+        private final ProgressBar progressBar;
+        private final MaterialCardView option1Card, option2Card, option3Card, option4Card;
+        private final OnQuestionPackClickListener listener;
 
         public QuestionPackForJoinViewHolder(@NonNull View itemView, OnQuestionPackClickListener listener) {
             super(itemView);
             this.listener = listener;
-            Context context = itemView.getContext();
-
             tvQuestion = itemView.findViewById(R.id.tvQuestion);
             tvOption1 = itemView.findViewById(R.id.option1Text);
             tvOption2 = itemView.findViewById(R.id.option2Text);
             tvOption3 = itemView.findViewById(R.id.option3Text);
             tvOption4 = itemView.findViewById(R.id.option4Text);
             tvStepProgress = itemView.findViewById(R.id.tvStepProgress);
-
+            progressBar = itemView.findViewById(R.id.progressBar);
             option1Card = itemView.findViewById(R.id.option1Card);
             option2Card = itemView.findViewById(R.id.option2Card);
             option3Card = itemView.findViewById(R.id.option3Card);
             option4Card = itemView.findViewById(R.id.option4Card);
+            setCardListeners();
+        }
 
-            // Set up click listeners
-            option1Card.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onOptionSelected(1);
-                }
-            });
-
-            option2Card.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onOptionSelected(2);
-                }
-            });
-
-            option3Card.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onOptionSelected(3);
-                }
-            });
-
-            option4Card.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onOptionSelected(4);
-                }
-            });
+        private void setCardListeners() {
+            option1Card.setOnClickListener(v -> listener.onOptionSelected(1));
+            option2Card.setOnClickListener(v -> listener.onOptionSelected(2));
+            option3Card.setOnClickListener(v -> listener.onOptionSelected(3));
+            option4Card.setOnClickListener(v -> listener.onOptionSelected(4));
         }
 
         public void bind(Question question, int selectedOptionIndex, int currentIndex, int totalQuestions) {
@@ -115,30 +95,25 @@ public class QuestionPackForJoinAdapter extends RecyclerView.Adapter<QuestionPac
             tvOption2.setText(question.getAnswer2());
             tvOption3.setText(question.getAnswer3());
             tvOption4.setText(question.getAnswer4());
-
-            // Cập nhật tiến trình
-            tvStepProgress.setText(String.format("Step %d/%d", currentIndex + 1, totalQuestions));
-
-            // Reset màu
+            tvStepProgress.setText(String.format(" %d of %d", currentIndex + 1, totalQuestions));
+            progressBar.setProgress((int) (((float) (currentIndex + 1) / totalQuestions) * 100));
             resetCardColors();
-
-            // Đánh dấu màu cho option đã chọn
-            if (selectedOptionIndex != -1) {
-                MaterialCardView selectedCard = getCardByIndex(selectedOptionIndex);
-                if (selectedCard != null) {
-                    selectedCard.setCardBackgroundColor(
-                            ContextCompat.getColor(itemView.getContext(), R.color.green)
-                    );
-                }
-            }
+            highlightSelectedOption(selectedOptionIndex);
         }
 
-
         private void resetCardColors() {
-            option1Card.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.background));
-            option2Card.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.background));
-            option3Card.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.background));
-            option4Card.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.background));
+            int defaultColor = ContextCompat.getColor(itemView.getContext(), R.color.background);
+            option1Card.setCardBackgroundColor(defaultColor);
+            option2Card.setCardBackgroundColor(defaultColor);
+            option3Card.setCardBackgroundColor(defaultColor);
+            option4Card.setCardBackgroundColor(defaultColor);
+        }
+
+        private void highlightSelectedOption(int index) {
+            MaterialCardView selectedCard = getCardByIndex(index);
+            if (selectedCard != null) {
+                selectedCard.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.green));
+            }
         }
 
         private MaterialCardView getCardByIndex(int index) {

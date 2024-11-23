@@ -1,7 +1,9 @@
 package com.example.crabquizz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -72,6 +74,17 @@ public class ExamResultActivity extends AppCompatActivity {
      */
     private void setupListeners() {
         // Đóng Activity khi nhấn nút Confirm
-        btnConfirm.setOnClickListener(v -> finish());
+        btnConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StudentQuestionViewFragment studentQuestionViewFragment = new StudentQuestionViewFragment();
+
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, studentQuestionViewFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
     }
 }

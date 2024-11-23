@@ -157,8 +157,6 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
         currentQuestion.add(questions.get(currentQuestionIndex));
         adapter.updateQuestions(currentQuestion);
         recyclerViewQuestions.scrollToPosition(0);
-
-        adapter.notifyItemChanged(0);
     }
 
     @Override
@@ -166,15 +164,6 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
         if (currentQuestionIndex < questions.size()) {
             Question currentQuestion = questions.get(currentQuestionIndex);
             currentQuestion.setSelectedOption(optionIndex);
-
-            QuestionAnswer questionAnswer = new QuestionAnswer(
-                    currentQuestion.getId(),
-                    optionIndex
-            );
-
-            dbContext.add("questionanswers", questionAnswer)
-                    .addOnSuccessListener(aVoid -> Toast.makeText(this, "Answer saved", Toast.LENGTH_SHORT).show())
-                    .addOnFailureListener(e -> Toast.makeText(this, "Save failed", Toast.LENGTH_SHORT).show());
 
             if (optionIndex == currentQuestion.getCorrectAnswer()) {
                 correctAnswersCount++;
@@ -201,7 +190,7 @@ public class QuizActivity extends AppCompatActivity implements QuestionPackForJo
                 String.valueOf(correctAnswersCount),
                 formattedTimeUsed
         );
-            dbContext.add("studenscores", studentScore)
+            dbContext.add("studentscores", studentScore)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(this, "Exam result saved", Toast.LENGTH_SHORT).show();
                     })

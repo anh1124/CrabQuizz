@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.crabquizz.MainActivity2;
+import com.example.crabquizz.QuizActivity;
 import com.example.crabquizz.R;
 import com.example.crabquizz.Scripts.Controller.SessionManager;
 import com.example.crabquizz.Scripts.Controller.StudentClassController;
@@ -112,8 +114,12 @@ public class ClassStudentAdapter extends RecyclerView.Adapter<ClassStudentAdapte
     }
 
     private void takeExam(Context context, StudentClass studentClass) {
-        // Logic for taking the exam (could navigate to an exam screen or fetch exam details)
-        studentClass.getId();//truyeefn cais nay vao MainActivity2
+        Intent intent = new Intent(context, StudentExamResultsActivity.class);
+        String packId = studentClass.getquestionPackIdNowForExam(); // Verify this method name
+
+        intent.putExtra("packId", packId);
+
+        context.startActivity(intent);
         Toast.makeText(context, "Bắt đầu làm bài kiểm tra của lớp " + studentClass.getName(), Toast.LENGTH_SHORT).show();
     }
 
