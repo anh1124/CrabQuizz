@@ -55,7 +55,6 @@ public class DbContext {
                 });
     }
 
-
     public String getUsersCollection() {
         return USERS_COLLECTION;
     }

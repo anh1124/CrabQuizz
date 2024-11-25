@@ -9,7 +9,11 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.example.crabquizz.Scripts.Controller.NavigationController;
+import com.example.crabquizz.Scripts.Models.StudentClass;
 import com.google.android.material.button.MaterialButton;
 
 public class ExamResultActivity extends AppCompatActivity {
@@ -77,13 +81,10 @@ public class ExamResultActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StudentQuestionViewFragment studentQuestionViewFragment = new StudentQuestionViewFragment();
-
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, studentQuestionViewFragment)
-                        .addToBackStack(null)
-                        .commit();
+//                NavigationController navigationController = new NavigationController(ExamResultActivity.this);
+//                navigationController.navigateTo(new HomeFragment());
+                Intent intent = new Intent(ExamResultActivity.this, ScreenStudentClassFragment.class);
+                startActivity(intent);
             }
         });
     }

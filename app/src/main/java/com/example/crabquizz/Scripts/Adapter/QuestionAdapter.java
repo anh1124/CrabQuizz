@@ -96,17 +96,20 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             }
         });
 
-        // Set click listener for entire item để chỉnh sửa
-        holder.itemView.setOnClickListener(v -> {
+        // Các listeners cho nhập liệu nếu dùng OnQuestionInteractionListener
+        if (listener != null) {
+            setupDetailedListeners(holder, position);
+        }
+
+        // Thêm listener cho nút sửa
+        holder.editButton.setOnClickListener(v -> {
             if (editListener != null) {
                 editListener.onQuestionEdit(question);
             }
         });
 
-        // Các listeners cho nhập liệu nếu dùng OnQuestionInteractionListener
-        if (listener != null) {
-            setupDetailedListeners(holder, position);
-        }
+        // Loại bỏ click listener cho cả item view vì giờ ta có nút sửa riêng
+        holder.itemView.setOnClickListener(null);
     }
 
     private void setupDetailedListeners(QuestionViewHolder holder, int position) {
@@ -171,7 +174,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         EditText optionAInput, optionBInput, optionCInput, optionDInput;
         RadioButton optionARadio, optionBRadio, optionCRadio, optionDRadio;
         RadioGroup answerGroup;
-        ImageButton deleteButton;
+        ImageButton deleteButton, editButton;
 
         public QuestionViewHolder(View itemView) {
             super(itemView);
@@ -188,6 +191,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             optionDRadio = itemView.findViewById(R.id.optionDRadio);
             answerGroup = itemView.findViewById(R.id.correctAnswerGroup);
             deleteButton = itemView.findViewById(R.id.deleteQuestionButton);
+            editButton = itemView.findViewById(R.id.editQuestionButton);
         }
     }
 }
